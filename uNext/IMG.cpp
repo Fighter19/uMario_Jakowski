@@ -28,7 +28,11 @@ void CIMG::Draw(SDL_Renderer* rR, int iXOffset, int iYOffset, bool bRotate) {
 	if(!bRotate) {
 		SDL_RenderCopy(rR, tIMG, NULL, &rRect);
 	} else {
+#ifndef PSP
 		SDL_RenderCopyEx(rR, tIMG, NULL, &rRect, 180.0, NULL, SDL_FLIP_VERTICAL);
+#else
+        SDL_RenderCopyEx(rR, tIMG, NULL, &rRect, 180.0, NULL, SDL_FLIP_HORIZONTAL);
+#endif
 	}
 }
 
@@ -36,7 +40,11 @@ void CIMG::DrawVert(SDL_Renderer* rR, int iXOffset, int iYOffset) {
 	rRect.x = iXOffset;
 	rRect.y = iYOffset;
 
-	SDL_RenderCopyEx(rR, tIMG, NULL, &rRect, 180.0, NULL, SDL_FLIP_HORIZONTAL);
+#ifndef PSP
+        SDL_RenderCopyEx(rR, tIMG, NULL, &rRect, 180.0, NULL, SDL_FLIP_HORIZONTAL);
+#else
+        SDL_RenderCopyEx(rR, tIMG, NULL, &rRect, 180.0, NULL, SDL_FLIP_VERTICAL);
+#endif
 }
 
 void CIMG::Draw(SDL_Renderer* rR, SDL_Rect rCrop, SDL_Rect rRect) {

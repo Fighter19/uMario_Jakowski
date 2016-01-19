@@ -12,8 +12,13 @@ CCFG::~CCFG(void) {
 
 /* ******************************************** */
 
+#ifndef PSP
 int CCFG::GAME_WIDTH  = 800;
 int CCFG::GAME_HEIGHT = 448;
+#else
+int CCFG::GAME_WIDTH  = 480;
+int CCFG::GAME_HEIGHT = 272;
+#endif
 
 Text* CCFG::oText = new Text();
 CIMG* CCFG::tSMBLOGO = new CIMG();

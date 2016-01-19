@@ -4,7 +4,7 @@
 #include "CFG.h"
 #include "Text.h"
 #include "SDL_mixer.h"
-#include "joystick.h"
+#include "Joystick.h"
 
 /* ******************************************** */
 
