@@ -41,7 +41,9 @@ void MainMenu::Draw(SDL_Renderer* rR) {
 	CCFG::getText()->Draw(rR, "WWW.LUKASZJAKOWSKI.PL", 5, CCFG::GAME_HEIGHT - 5 - 8, 8, 255, 255, 255);
 
 	if(selectWorld) {
-		SDL_SetRenderDrawBlendMode(rR, SDL_BLENDMODE_BLEND);
+        #ifndef PSP
+        SDL_SetRenderDrawBlendMode(rR, SDL_BLENDMODE_BLEND);
+        #endif
 		SDL_SetRenderDrawColor(rR, 4, 4, 4, 235);
 		SDL_RenderFillRect(rR, &rSelectWorld);
 		SDL_SetRenderDrawColor(rR, 255, 255, 255, 255);

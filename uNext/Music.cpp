@@ -118,7 +118,7 @@ void Music::PlayMusic() {
 		if(Mix_PlayMusic(vMusic[currentMusic - 1], -1) == - 1)
 			printf("Error playing music: %s", Mix_GetError() );
 		
-		printf("Music stopped = false");
+        printf("Music stopped = false\n");
 		musicStopped = false;
 	} else {
 		StopMusic();
