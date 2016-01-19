@@ -5,11 +5,7 @@
 /* ******************************************** */
 
 Music::Music(void) {
-#ifdef PSP
-	//chdir("umd0:/");
-#endif
 
-printf("Who loads a bow out of ice?");
 	Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048);
 
 	vMusic.push_back(loadMusic("overworld"));
@@ -170,35 +166,10 @@ void Music::PlayChunk(eChunk chunkID) {
 Mix_Music* Music::loadMusic(std::string fileName) {
 	printf("Loading Music, %s\n", fileName.c_str());
 	fileName = "files/sounds/" + fileName + ".wav";
-/*
-	SDL_RWops *file = SDL_RWFromFile("files/sounds/overworld.ogg", "rb");
-		if (!file)
-	{
-			printf("Error loading file: %s %s\n", fileName.c_str(), SDL_GetError());
-	}
-	else
-	{
-			printf("Successfully opened %p", file);
-	}
-*/
-//	printf("Current working directory: %s Error: %s", SDL_GetBasePath(), SDL_GetError());
 
-
-	SDL_RWops *file = SDL_RWFromFile("umd0:/dick.bin", "w+b");
-		if (!file)
-	{
-			printf("Error writing file: %s %s\n", "Dick", SDL_GetError());
-			
-	}
-	else
-	{
-//			printf("Successfully opened %p\n", file);
-			SDL_RWclose( file );
-	}
 
 	Mix_Music* music = Mix_LoadMUS(fileName.c_str());
 
-//	Mix_Music* music = NULL;
 
 	if( music == NULL )
 	{
@@ -207,25 +178,14 @@ Mix_Music* Music::loadMusic(std::string fileName) {
 	else
 	{
 			printf("Successfully opened music file %p\n", music);
-//		Mix_PlayMusic( music, -1 );
+
 	}
 
-//	Mix_Music* music = Mix_LoadMUS(fileName.c_str());
 	if(!music) {
 	    printf("Mix_LoadMUS(): %s\n", Mix_GetError());
-	    // this might be a critical error...
 	}
 
-	if(!strcmp(fileName.c_str(),"files/sounds/overworld.wav"))
-	{
-		printf("At Overworld");
-		if(Mix_PlayMusic(music, -1) == - 1)
-			printf("Error playing music: %s", Mix_GetError() );
-	}
-	else
-	{
-	//	printf("Fuck dat shit %s", fileName.c_str());
-	}
+
 	return music;
 }
 
@@ -240,5 +200,5 @@ int Music::getVolume() {
 
 void Music::setVolume(int iVolume) {
 	this->iVolume = iVolume;
-	Mix_VolumeMusic(100);
+    Mix_VolumeMusic(iVolume);
 }

@@ -63,6 +63,8 @@ CCore::CCore(void) {
 				}
 	
 */
+    CCFG::initMusic();
+
 	oMap = new Map(rR);
 	CCFG::getMM()->setActiveOption(rR);
 	CCFG::getSMBLOGO()->setIMG("super_mario_bros", rR);

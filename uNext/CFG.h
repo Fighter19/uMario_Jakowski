@@ -32,6 +32,7 @@ public:
 
 	static MenuManager* getMM();
 	static Music* getMusic();
+    static void initMusic();
 
 	static bool canMoveBackward;
 };
