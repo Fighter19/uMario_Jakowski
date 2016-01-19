@@ -23,9 +23,10 @@ MusicManager::~MusicManager(void) {
 void MusicManager::PlayMusic() {
 	vMusic.push_back(Mix_LoadMUS("files/sounds/overworld.wav"));
 	vMusic.push_back(Mix_LoadMUS("files/sounds/overworld.wav"));
-	Mix_VolumeMusic(100);
-	Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048);
-	Mix_PlayMusic(vMusic[0], -1);
+	printf("Sick shit so focused I break your concentration");
+	//Mix_VolumeMusic(100);
+	//Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048);
+	//Mix_PlayMusic(vMusic[0], -1);
 }
 
 /* ******************************************** */

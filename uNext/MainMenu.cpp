@@ -5,6 +5,7 @@
 /* ******************************************** */
 
 MainMenu::MainMenu(void) {
+
 	this->lMO.push_back(new MenuOption("1 PLAYER GAME", 178, 276));
 	this->lMO.push_back(new MenuOption("OPTIONS", 222, 308));
 	this->lMO.push_back(new MenuOption("ABOUT", 237, 340));

@@ -30,7 +30,11 @@ CCore::CCore(void) {
 	this->iNumOfFPS = 0;
 	this->lFPSTime = 0;
 
-	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_AUDIO);
+	SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_AUDIO|SDL_INIT_JOYSTICK);
+
+	SDL_SetHint (SDL_HINT_JOYSTICK_ALLOW_BACKGROUND_EVENTS, "1");
+
+	SDL_JoystickOpen( 0 );
 	
 	window = SDL_CreateWindow("uMario - www.LukaszJakowski.pl", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, CCFG::GAME_WIDTH, CCFG::GAME_HEIGHT, SDL_WINDOW_SHOWN);
 
@@ -50,9 +54,15 @@ CCore::CCore(void) {
 
 	mainEvent = new SDL_Event();
 	// ----- ICO
+	/*
+				 //Initialize SDL_mixer
+				if( Mix_OpenAudio( 44100, MIX_DEFAULT_FORMAT, 2, 2048 ) < 0 )
+				{
+					printf( "SDL_mixer could not initialize! SDL_mixer Error: %s\n", Mix_GetError() );
+					//success = false;
+				}
 	
-	Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048);
-	
+*/
 	oMap = new Map(rR);
 	CCFG::getMM()->setActiveOption(rR);
 	CCFG::getSMBLOGO()->setIMG("super_mario_bros", rR);
@@ -183,6 +193,31 @@ void CCore::InputMenu() {
 				break;
 		}
 	}
+
+	if(mainEvent->type == SDL_JOYBUTTONDOWN){
+		//printf("Button pressed: %i\n", mainEvent->type);
+		//PRINT("Button pressed" + mainEvent->type +"\n");
+		CCFG::getMM()->setKey(mainEvent->jbutton.button);
+		switch(mainEvent->jbutton.button){
+			case 0: case 1:
+				if(!keyMenuPressed) {
+					CCFG::getMM()->enter();
+					keyMenuPressed = true;
+				}
+				break;
+
+		}
+	}
+	if(mainEvent->type == SDL_JOYBUTTONUP){
+		CCFG::getMM()->setKey(mainEvent->jbutton.button);
+		switch(mainEvent->jbutton.button){
+			case 0: case 1:
+				keyMenuPressed = false;
+				break;
+
+		}
+	}
+
 }
 
 void CCore::InputPlayer() {
