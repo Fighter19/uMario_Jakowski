@@ -4,6 +4,7 @@
 #include "CFG.h"
 #include "Text.h"
 #include "SDL_mixer.h"
+#include "joystick.h"
 
 /* ******************************************** */
 
@@ -196,12 +197,13 @@ void CCore::InputMenu() {
 		}
 	}
 
+#ifdef PSP
 	if(mainEvent->type == SDL_JOYBUTTONDOWN){
-		//printf("Button pressed: %i\n", mainEvent->type);
+        //printf("Button pressed: %i\n", mainEvent->jbutton.button);
 		//PRINT("Button pressed" + mainEvent->type +"\n");
 		CCFG::getMM()->setKey(mainEvent->jbutton.button);
 		switch(mainEvent->jbutton.button){
-			case 0: case 1:
+            case PSP_BUTTON_CROSS: case PSP_BUTTON_CIRCLE:
 				if(!keyMenuPressed) {
 					CCFG::getMM()->enter();
 					keyMenuPressed = true;
@@ -219,8 +221,11 @@ void CCore::InputMenu() {
 
 		}
 	}
+    #endif
 
 }
+
+
 
 void CCore::InputPlayer() {
 	if(mainEvent->type == SDL_WINDOWEVENT) {
@@ -272,6 +277,48 @@ void CCore::InputPlayer() {
 				break;
 		}
 	}
+
+#ifdef PSP
+    if(mainEvent->type == SDL_JOYBUTTONUP) {
+        if(mainEvent->jbutton.button == PSP_BUTTON_RIGHT) {
+                if(firstDir) {
+                    firstDir = false;
+                }
+
+                keyDPressed = false;
+            }
+
+            if(mainEvent->jbutton.button == PSP_BUTTON_DOWN) {
+                oMap->getPlayer()->setSquat(false);
+                keyS = false;
+            }
+
+            if(mainEvent->jbutton.button == PSP_BUTTON_LEFT) {
+                if(!firstDir) {
+                    firstDir = true;
+                }
+
+                keyAPressed = false;
+            }
+
+            if(mainEvent->jbutton.button == PSP_BUTTON_CIRCLE) {
+                CCFG::keySpace = false;
+            }
+
+            if(mainEvent->jbutton.button == PSP_BUTTON_CROSS) {
+                if(keyShift) {
+                    oMap->getPlayer()->resetRun();
+                    keyShift = false;
+                }
+            }
+        switch(mainEvent->jbutton.button) {
+            case PSP_BUTTON_SELECT:
+                keyMenuPressed = false;
+                break;
+        }
+    }
+
+#endif
 
 	if(mainEvent->type == SDL_KEYDOWN) {
 		if(mainEvent->key.keysym.sym == CCFG::keyIDD) {
@@ -326,6 +373,62 @@ void CCore::InputPlayer() {
 				break;
 		}
 	}
+
+#ifdef PSP
+    if(mainEvent->type == SDL_JOYBUTTONDOWN) {
+        if(mainEvent->jbutton.button == PSP_BUTTON_RIGHT) {
+            keyDPressed = true;
+            if(!keyAPressed) {
+                firstDir = true;
+            }
+        }
+
+        if(mainEvent->jbutton.button == PSP_BUTTON_DOWN) {
+            if(!keyS) {
+                keyS = true;
+                if(!oMap->getUnderWater() && !oMap->getPlayer()->getInLevelAnimation()) oMap->getPlayer()->setSquat(true);
+            }
+        }
+
+        if(mainEvent->jbutton.button == PSP_BUTTON_LEFT) {
+            keyAPressed = true;
+            if(!keyDPressed) {
+                firstDir = false;
+            }
+        }
+
+        if(mainEvent->jbutton.button == PSP_BUTTON_CIRCLE) {
+            if(!CCFG::keySpace) {
+                oMap->getPlayer()->jump();
+                CCFG::keySpace = true;
+            }
+        }
+
+        if(mainEvent->jbutton.button == PSP_BUTTON_CROSS) {
+            if(!keyShift) {
+                oMap->getPlayer()->startRun();
+                keyShift = true;
+            }
+        }
+
+        switch(mainEvent->jbutton.button) {
+            case PSP_BUTTON_CIRCLE:
+                if(!keyMenuPressed) {
+                    CCFG::getMM()->enter();
+                    keyMenuPressed = true;
+                }
+            case PSP_BUTTON_START:
+                if(!keyMenuPressed && CCFG::getMM()->getViewID() == CCFG::getMM()->eGame) {
+                    CCFG::getMM()->resetActiveOptionID(CCFG::getMM()->ePasue);
+                    CCFG::getMM()->setViewID(CCFG::getMM()->ePasue);
+                    CCFG::getMusic()->PlayChunk(CCFG::getMusic()->cPASUE);
+                    CCFG::getMusic()->PauseMusic();
+                    keyMenuPressed = true;
+                }
+                break;
+        }
+    }
+#endif
 
 	if(keyAPressed) {
 		if(!oMap->getPlayer()->getMove() && firstDir == false && !oMap->getPlayer()->getChangeMoveDirection() && !oMap->getPlayer()->getSquat()) {
