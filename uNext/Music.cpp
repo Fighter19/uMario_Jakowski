@@ -139,7 +139,7 @@ void Music::PlayMusic(eMusic musicID) {
 
 void Music::StopMusic() {
 	if(!musicStopped) {
-		//Mix_HaltMusic();
+        Mix_HaltMusic();
 		musicStopped = true;
 	}
 }
