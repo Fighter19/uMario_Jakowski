@@ -13,8 +13,8 @@ Fire::Fire(float fXPos, float fYPos, int toYPos) {
 	this->moveDirection = true;
 
 	this->iBlockID = 22;
-	this->iHitBoxX = 48;
-	this->iHitBoxY = 10;
+    this->iHitBoxX = 48*CCFG::GAME_SIZE;
+    this->iHitBoxY = 10*CCFG::GAME_SIZE;
 
 	this->minionSpawned = true;
 }

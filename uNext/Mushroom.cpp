@@ -11,7 +11,7 @@ Mushroom::Mushroom(int iXPos, int fYPos, bool powerUP, int iX, int iY) {
 	this->moveSpeed = 2;
 	this->inSpawnState = true;
 	this->minionSpawned = true;
-	this->inSpawnY = 30;
+    this->inSpawnY = 30*CCFG::GAME_SIZE;
 	this->moveDirection = false;
 	this->powerUP = powerUP;
 	this->collisionOnlyWithPlayer = true;

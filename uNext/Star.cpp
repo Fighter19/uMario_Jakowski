@@ -22,8 +22,8 @@ Star::Star(int iXPos, int iYPos, int iX, int iY) {
 
 	this->iBlockID = 24;
 
-	this->iHitBoxX = 28;
-	this->iHitBoxY = 32;
+    this->iHitBoxX = 28*CCFG::GAME_SIZE;
+    this->iHitBoxY = 32*CCFG::GAME_SIZE;
 }
 
 Star::~Star(void) {

@@ -7,8 +7,8 @@ Spring::Spring(int iXPos, int iYPos) {
 	this->fXPos = (float)iXPos;
 	this->fYPos = (float)iYPos + 2;
 
-	this->iHitBoxX = 32;
-	this->iHitBoxY = 72;
+    this->iHitBoxX = 32*CCFG::GAME_SIZE;
+    this->iHitBoxY = 72*CCFG::GAME_SIZE;
 
 	this->iBlockID = CCore::getMap()->getLevelType() == 0 || CCore::getMap()->getLevelType() == 4 ? 37 : 40;
 

@@ -1060,7 +1060,7 @@ int Player::getHitBoxX() {
 }
 
 int Player::getHitBoxY() {
-	return powerLVL == 0 ? iSmallY : bSquat ? 44 : iBigY;
+    return powerLVL == 0 ? iSmallY : bSquat ? 44*CCFG::GAME_SIZE : iBigY;
 }
 
 /* ******************************************** */

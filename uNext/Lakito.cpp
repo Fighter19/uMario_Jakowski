@@ -16,8 +16,8 @@ Lakito::Lakito(int iXPos, int iYPos, int iMaxXPos) {
 	this->iBlockID = 50;
 
 	this->collisionOnlyWithPlayer = true;
-	this->iHitBoxX = 32;
-	this->iHitBoxY = 26;
+    this->iHitBoxX = 32*CCFG::GAME_SIZE;
+    this->iHitBoxY = 26*CCFG::GAME_SIZE;
 
 	this->moveDirection = true;
 

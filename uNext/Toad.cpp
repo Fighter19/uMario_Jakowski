@@ -13,8 +13,8 @@ Toad::Toad(int iXPos, int iYPos, bool peach) {
 	this->minionSpawned = true;
 	this->iBlockID = peach ? 27 : 26;
 
-	this->iHitBoxX = 32;
-	this->iHitBoxY = 48;
+    this->iHitBoxX = 32*CCFG::GAME_SIZE;
+    this->iHitBoxY = 48*CCFG::GAME_SIZE;
 }
 
 Toad::~Toad(void) {

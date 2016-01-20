@@ -20,8 +20,8 @@ Vine::Vine(int iXPos, int iYPos, int minionState, int iBlockID) {
 	this->jumpDistance = 0;
 	this->minionSpawned = true;
 
-	this->iHitBoxX = 24;
-	this->iHitBoxY = -32;
+    this->iHitBoxX = 24*CCFG::GAME_SIZE;
+    this->iHitBoxY = -32*CCFG::GAME_SIZE;
 }
 
 Vine::~Vine(void) {

@@ -7,6 +7,7 @@
 #include "Vector2.h"
 #include <vector>
 #include <string>
+#include "CFG.h"
 
 class Player
 {
@@ -80,8 +81,8 @@ private:
 	unsigned int nextBubbleTime;
 	int nextFallFrameID;
 
-	const static int iSmallX = 24, iSmallY = 32;
-	const static int iBigX = 32, iBigY = 64;
+    const static int iSmallX = 24*CCFG::GAME_SIZE, iSmallY = 32*CCFG::GAME_SIZE;
+    const static int iBigX = 32*CCFG::GAME_SIZE, iBigY = 64*CCFG::GAME_SIZE;
 
 	int nextFireBallFrameID;
 

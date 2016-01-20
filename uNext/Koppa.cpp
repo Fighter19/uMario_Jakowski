@@ -17,27 +17,27 @@ Koppa::Koppa(int iX, int iY, int minionState, bool moveDirection, int iBlockID) 
 
 	switch(minionState) {
 		case 0:
-			this->iHitBoxX = 32;
-			this->iHitBoxY = 32;
+            this->iHitBoxX = 32*CCFG::GAME_SIZE;
+            this->iHitBoxY = 32*CCFG::GAME_SIZE;
 			break;
 		case 1:
-			this->iHitBoxX = 32;
-			this->iHitBoxY = 32;
+            this->iHitBoxX = 32*CCFG::GAME_SIZE;
+            this->iHitBoxY = 32*CCFG::GAME_SIZE;
 			break;
 		case 2:
-			this->iHitBoxX = 32;
-			this->iHitBoxY = 28;
-			this->moveSpeed = 0;
+            this->iHitBoxX = 32*CCFG::GAME_SIZE;
+            this->iHitBoxY = 28*CCFG::GAME_SIZE;
+            this->moveSpeed = 0;
 			this->killOtherUnits = true;
 			break;
 		case 3:
-			this->iHitBoxX = 32;
-			this->iHitBoxY = 32;
+            this->iHitBoxX = 32*CCFG::GAME_SIZE;
+            this->iHitBoxY = 32*CCFG::GAME_SIZE;
 			this->moveDirection = true;
 			break;
 	}
 
-	this->iDistance = 7*32;
+    this->iDistance = 7*32*CCFG::GAME_SIZE;
 }
 
 Koppa::~Koppa(void) {
@@ -53,7 +53,7 @@ void Koppa::minionPhysics() {
 				fYPos -= 2;
 				iDistance -= 2;
 			} else {
-				iDistance = 7*32;
+                iDistance = 7*32*CCFG::GAME_SIZE;
 				flyDirection = !flyDirection;
 			}
 		} else {
@@ -61,7 +61,7 @@ void Koppa::minionPhysics() {
 				fYPos += 2;
 				iDistance -= 2;
 			} else {
-				iDistance = 7*32;
+                iDistance = 7*32*CCFG::GAME_SIZE;
 				flyDirection = !flyDirection;
 			}
 		}
@@ -239,16 +239,16 @@ void Koppa::setMinionState(int minionState) {
 void Koppa::setMinion() {
 	switch(minionState) {
 		case 0: case 3:
-			this->iHitBoxX = 32;
-			this->iHitBoxY = 32;
+            this->iHitBoxX = 32*CCFG::GAME_SIZE;
+            this->iHitBoxY = 32*CCFG::GAME_SIZE;
 			break;
 		case 1:
-			this->iHitBoxX = 32;
-			this->iHitBoxY = 32;
+            this->iHitBoxX = 32*CCFG::GAME_SIZE;
+            this->iHitBoxY = 32*CCFG::GAME_SIZE;
 			break;
 		case 2:
-			this->iHitBoxX = 32;
-			this->iHitBoxY = 28;
+            this->iHitBoxX = 32*CCFG::GAME_SIZE;
+            this->iHitBoxY = 28*CCFG::GAME_SIZE;
 			this->moveSpeed = 0;
 			this->killOtherUnits = true;
 			break;

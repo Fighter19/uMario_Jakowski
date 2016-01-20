@@ -18,7 +18,8 @@ public:
 	CCFG(void);
 	~CCFG(void);
 
-	static int GAME_WIDTH, GAME_HEIGHT;
+    static int GAME_WIDTH, GAME_HEIGHT;
+    constexpr static float GAME_SIZE = 0.5f;
 
 	static bool keySpace;
 

@@ -14,8 +14,8 @@ Cheep::Cheep(int iXPos, int iYPos, int minionType, int moveSpeed, bool moveDirec
 	this->moveY = false;
 	this->moveDirection = false;
 
-	this->iHitBoxX = 30;
-	this->iHitBoxY = 28;
+    this->iHitBoxX = 30*CCFG::GAME_SIZE;
+    this->iHitBoxY = 28*CCFG::GAME_SIZE;
 
 	if(minionType == 1) {
 		this->minionState = 1;

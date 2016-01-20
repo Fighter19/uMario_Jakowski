@@ -9,8 +9,8 @@ Hammer::Hammer(int iXPos, int iYPos, bool moveDirection) {
 
 	this->iBlockID = CCore::getMap()->getLevelType() == 0 || CCore::getMap()->getLevelType() == 4 ? 47 : 48;
 
-	this->iHitBoxX = 24;
-	this->iHitBoxY = 24;
+    this->iHitBoxX = 24*CCFG::GAME_SIZE;
+    this->iHitBoxY = 24*CCFG::GAME_SIZE;
 
 	this->moveDirection = moveDirection;
 	this->jumpState = 1;

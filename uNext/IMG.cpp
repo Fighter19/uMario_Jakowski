@@ -1,4 +1,5 @@
 #include "IMG.h"
+#include "CFG.h"
 
 /* ******************************************** */
 
@@ -56,8 +57,11 @@ void CIMG::Draw(SDL_Renderer* rR, SDL_Rect rCrop, SDL_Rect rRect) {
 void CIMG::setIMG(std::string fileName, SDL_Renderer* rR) {
 	fileName = "files/images/" + fileName + ".bmp";
 	SDL_Surface* loadedSurface = SDL_LoadBMP(fileName.c_str());
+    //SDL_Surface* tempSurface = SDL_CreateRGBSurface;
+
 	SDL_SetColorKey(loadedSurface, SDL_TRUE, SDL_MapRGB(loadedSurface->format, 255, 0, 255));
 
+    //SDL_BlitScaled(loadedSurface, NULL, loadedSurface, )
 	tIMG = SDL_CreateTextureFromSurface(rR, loadedSurface);
 	int iWidth, iHeight;
 
@@ -65,8 +69,8 @@ void CIMG::setIMG(std::string fileName, SDL_Renderer* rR) {
 	
 	rRect.x  = 0;
 	rRect.y = 0;
-	rRect.w = iWidth;
-	rRect.h = iHeight;
+    rRect.w = iWidth*CCFG::GAME_SIZE;
+    rRect.h = iHeight*CCFG::GAME_SIZE;
 	SDL_FreeSurface(loadedSurface);
 }
 

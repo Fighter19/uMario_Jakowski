@@ -8,8 +8,8 @@ FireBall::FireBall(int iXPos, int iYPos, int radius, int nSliceID, bool moveDire
 	this->iCenterX = iXPos;
 	this->iCenterY = iYPos;
 
-	this->iHitBoxX = 16;
-	this->iHitBoxY = 16;
+    this->iHitBoxX = 16*CCFG::GAME_SIZE;
+    this->iHitBoxY = 16*CCFG::GAME_SIZE;
 
 	this->radius = radius;
 

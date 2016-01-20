@@ -7,8 +7,8 @@ Plant::Plant(int fXPos, int fYPos, int iBlockID) {
 	this->fXPos = (float)fXPos + 2;
 	this->fYPos = (float)fYPos + 6;
 
-	this->iHitBoxX = 28;
-	this->iHitBoxY = 38;
+    this->iHitBoxX = 28*CCFG::GAME_SIZE;
+    this->iHitBoxY = 38*CCFG::GAME_SIZE;
 
 	this->iBlockID = iBlockID;
 

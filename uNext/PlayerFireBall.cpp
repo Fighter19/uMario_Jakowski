@@ -19,8 +19,8 @@ PlayerFireBall::PlayerFireBall(int iXPos, int iYPos, bool moveDirection) {
 
 	this->jumpState = 2;
 
-	this->iHitBoxX = 16;
-	this->iHitBoxY = 16;
+    this->iHitBoxX = 16*CCFG::GAME_SIZE;
+    this->iHitBoxY = 16*CCFG::GAME_SIZE;
 
 	this->bDestroy = false;
 

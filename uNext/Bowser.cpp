@@ -9,7 +9,7 @@ Bowser::Bowser(float fXPos, float fYPos, bool spawnHammer) {
 	this->fXPos = fXPos;
 	this->fYPos = fYPos;
 	
-	this->iHitBoxX = this->iHitBoxY = 64;
+    this->iHitBoxX = this->iHitBoxY = 64*CCFG::GAME_SIZE;
 
 	this->iBlockID = 20;
 	this->moveDirection = true;

@@ -9,7 +9,7 @@ Squid::Squid(int iXPos, int iYPos) {
 	this->fXPos = (float)iXPos;
 	this->fYPos = (float)iYPos;
 
-	this->iHitBoxX = 32;
+    this->iHitBoxX = 32*CCFG::GAME_SIZE;
 	this->iBlockID = 29;
 
 	this->minionState = 0;

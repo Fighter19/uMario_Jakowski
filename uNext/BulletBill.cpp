@@ -10,7 +10,7 @@ BulletBill::BulletBill(int iXPos, int iYPos, bool moveDirection, int minionState
 	this->moveDirection = CCore::getMap()->getPlayer()->getXPos() - CCore::getMap()->getXPos() + CCore::getMap()->getPlayer()->getHitBoxX()/32 < fXPos + iHitBoxX/32;
 	this->moveSpeed = 4;
 
-	this->iHitBoxY = 30;
+    this->iHitBoxY = 30*CCFG::GAME_SIZE;
 
 	this->collisionOnlyWithPlayer = true;
 

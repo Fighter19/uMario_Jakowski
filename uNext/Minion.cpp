@@ -5,7 +5,7 @@
 
 Minion::Minion(void) {
 	this->minionState = 0;
-	this->iHitBoxX = this->iHitBoxY = 32;
+    this->iHitBoxX = this->iHitBoxY = 32*CCFG::GAME_SIZE;
 
 	this->killOtherUnits = false;
 	this->minionSpawned = false;

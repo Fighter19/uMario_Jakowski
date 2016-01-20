@@ -405,7 +405,7 @@ void Map::DrawMap(SDL_Renderer* rR) {
 	for(int i = getStartBlock(), iEnd = getEndBlock(); i < iEnd && i < iMapWidth; i++) {
 		for(int j = iMapHeight - 1; j >= 0; j--) {
 			if(lMap[i][j]->getBlockID() != 0) {
-				vBlock[lMap[i][j]->getBlockID()]->Draw(rR, 32 * i + (int)fXPos, CCFG::GAME_HEIGHT - 32 * j - 16 - lMap[i][j]->updateYPos());
+                vBlock[lMap[i][j]->getBlockID()]->Draw(rR, 32*CCFG::GAME_SIZE * i + (int)fXPos, CCFG::GAME_HEIGHT - 32*CCFG::GAME_SIZE * j - 16 - lMap[i][j]->updateYPos());
 			}
 		}
 	}
@@ -497,11 +497,11 @@ void Map::moveMap(int nX, int nY) {
 }
 
 int Map::getStartBlock() {
-	return (int)(-fXPos - (-(int)fXPos) % 32) / 32;
+    return (int)(-fXPos - (-(int)fXPos) % 32) / (32*CCFG::GAME_SIZE);
 }
 
 int Map::getEndBlock() {
-	return (int)(-fXPos - (-(int)fXPos) % 32 + CCFG::GAME_WIDTH) / 32 + 2;
+    return (int)(-fXPos - (-(int)fXPos) % 32 + CCFG::GAME_WIDTH) / (32*CCFG::GAME_SIZE) + 2;
 }
 
 /* ******************************************** */
@@ -510,19 +510,19 @@ int Map::getEndBlock() {
 /* ---------------- COLLISION ---------------- */
 
 Vector2* Map::getBlockID(int nX, int nY) {
-	return new Vector2((int)(nX < 0 ? 0 : nX) / 32, (int)(nY > CCFG::GAME_HEIGHT - 16 ? 0 : (CCFG::GAME_HEIGHT - 16 - nY + 32) / 32));
+    return new Vector2(getBlockIDX(nX), getBlockIDY(nY));
 }
 
 int Map::getBlockIDX(int nX) {
-	return (int)(nX < 0 ? 0 : nX) / 32;
+    return (int)(nX < 0 ? 0 : nX) / (32*CCFG::GAME_SIZE);
 }
 
 int Map::getBlockIDY(int nY) {
-	return (int)(nY > CCFG::GAME_HEIGHT - 16 ? 0 : (CCFG::GAME_HEIGHT - 16 - nY + 32) / 32);
+    return (int)(nY > CCFG::GAME_HEIGHT - 16 ? 0 : (CCFG::GAME_HEIGHT - 16 - nY + (32*CCFG::GAME_SIZE)) / (32*CCFG::GAME_SIZE));
 }
 
 bool Map::checkCollisionLB(int nX, int nY, int nHitBoxY, bool checkVisible) {
-	return checkCollision(getBlockID(nX, nY + nHitBoxY), checkVisible);
+    return checkCollision(getBlockID(nX, nY + nHitBoxY), checkVisible);
 }
 
 bool Map::checkCollisionLT(int nX, int nY, bool checkVisible) {
@@ -530,25 +530,25 @@ bool Map::checkCollisionLT(int nX, int nY, bool checkVisible) {
 }
 
 bool Map::checkCollisionLC(int nX, int nY, int nHitBoxY, bool checkVisible) {
-	return checkCollision(getBlockID(nX, nY + nHitBoxY), checkVisible);
+    return checkCollision(getBlockID(nX, nY + nHitBoxY), checkVisible);
 }
 
 bool Map::checkCollisionRC(int nX, int nY, int nHitBoxX, int nHitBoxY, bool checkVisible) {
-	return checkCollision(getBlockID(nX + nHitBoxX, nY + nHitBoxY), checkVisible);
+    return checkCollision(getBlockID(nX + nHitBoxX, nY + nHitBoxY), checkVisible);
 }
 
 bool Map::checkCollisionRB(int nX, int nY, int nHitBoxX, int nHitBoxY, bool checkVisible) {
-	return checkCollision(getBlockID(nX + nHitBoxX, nY + nHitBoxY), checkVisible);
+    return checkCollision(getBlockID(nX + nHitBoxX, nY + nHitBoxY), checkVisible);
 }
 
 bool Map::checkCollisionRT(int nX, int nY, int nHitBoxX, bool checkVisible) {
-	return checkCollision(getBlockID(nX + nHitBoxX, nY), checkVisible);
+    return checkCollision(getBlockID(nX + nHitBoxX, nY), checkVisible);
 }
 
 int Map::checkCollisionWithPlatform(int nX, int nY, int iHitBoxX, int iHitBoxY) {
 	for(unsigned int i = 0; i < vPlatform.size(); i++) {
-		if(-fXPos + nX + iHitBoxX >= vPlatform[i]->getXPos() && - fXPos + nX <= vPlatform[i]->getXPos() + vPlatform[i]->getSize() * 16) {
-			if(nY + iHitBoxY >= vPlatform[i]->getYPos() && nY + iHitBoxY <= vPlatform[i]->getYPos() + 16) {
+        if(-fXPos + nX + iHitBoxX >= vPlatform[i]->getXPos() && - fXPos + nX <= vPlatform[i]->getXPos() + vPlatform[i]->getSize() * 16) {
+            if(nY + iHitBoxY >= vPlatform[i]->getYPos() && nY + iHitBoxY <= vPlatform[i]->getYPos() + 16) {
 				return i;
 			}
 		}
@@ -564,9 +564,9 @@ bool Map::checkCollision(Vector2* nV, bool checkVisible) {
 }
 
 void Map::checkCollisionOnTopOfTheBlock(int nX, int nY) {
-	switch(lMap[nX][nY + 1]->getBlockID()) {
+    switch(lMap[nX][nY + 1]->getBlockID()) {
 		case 29: case 71: case 72: case 73:// COIN
-			lMap[nX][nY + 1]->setBlockID(0);
+            lMap[nX][nY + 1]->setBlockID(0);
 			lCoin.push_back(new Coin(nX * 32 + 7, CCFG::GAME_HEIGHT - nY * 32 - 48));
 			CCFG::getMusic()->PlayChunk(CCFG::getMusic()->cCOIN);
 			oPlayer->setCoins(oPlayer->getCoins() + 1);
@@ -577,7 +577,7 @@ void Map::checkCollisionOnTopOfTheBlock(int nX, int nY) {
 	for(int i = (nX - nX%5)/5, iEnd = i + 3; i < iEnd && i < iMinionListSize; i++) {
 		for(unsigned int j = 0; j < lMinion[i].size(); j++) {
 			if(!lMinion[i][j]->collisionOnlyWithPlayer && lMinion[i][j]->getMinionState() >= 0 && ((lMinion[i][j]->getXPos() >= nX*32 && lMinion[i][j]->getXPos() <= nX*32 + 32) || (lMinion[i][j]->getXPos() + lMinion[i][j]->iHitBoxX >= nX*32 && lMinion[i][j]->getXPos() + lMinion[i][j]->iHitBoxX <= nX*32 + 32))) {
-				if(lMinion[i][j]->getYPos() + lMinion[i][j]->iHitBoxY >= CCFG::GAME_HEIGHT - 24 - nY*32 && lMinion[i][j]->getYPos() + lMinion[i][j]->iHitBoxY <= CCFG::GAME_HEIGHT - nY*32 + 16) {
+                if(lMinion[i][j]->getYPos() + lMinion[i][j]->iHitBoxY >= CCFG::GAME_HEIGHT - 24 - nY*32 && lMinion[i][j]->getYPos() + lMinion[i][j]->iHitBoxY <= CCFG::GAME_HEIGHT - nY*32 + 16) {
 					lMinion[i][j]->moveDirection = !lMinion[i][j]->moveDirection;
 					lMinion[i][j]->setMinionState(-2);
 				}
@@ -595,14 +595,20 @@ int Map::getListID(int nX) {
 }
 
 void Map::addPoints(int X, int Y, std::string sText, int iW, int iH) {
+    X = X*CCFG::GAME_SIZE;
+    Y = Y*CCFG::GAME_SIZE;
 	lPoints.push_back(new Points(X, Y, sText, iW, iH));
 }
 
 void Map::addGoombas(int iX, int iY, bool moveDirection) {
-	lMinion[getListID(iX)].push_back(new Goombas(iX, iY, iLevelType == 0 || iLevelType == 4 ? 0 : iLevelType == 1 ? 8 : 10, moveDirection));
+    iX = iX*CCFG::GAME_SIZE;
+    iY = iY*CCFG::GAME_SIZE;
+    lMinion[getListID(iX)].push_back(new Goombas(iX, iY, iLevelType == 0 || iLevelType == 4 ? 0 : iLevelType == 1 ? 8 : 10, moveDirection));
 }
 
 void Map::addKoppa(int iX, int iY, int minionState, bool moveDirection) {
+    iX = iX*CCFG::GAME_SIZE;
+    iY = iY*CCFG::GAME_SIZE;
 	int tempBlock;
 
 	switch(minionState) {
@@ -621,72 +627,106 @@ void Map::addKoppa(int iX, int iY, int minionState, bool moveDirection) {
 }
 
 void Map::addBeetle(int X, int Y, bool moveDirection) {
+    X = X*CCFG::GAME_SIZE;
+    Y = Y*CCFG::GAME_SIZE;
 	lMinion[getListID(X)].push_back(new Beetle(X, Y, moveDirection));
 }
 
 void Map::addPlant(int iX, int iY) {
+    iX = iX*CCFG::GAME_SIZE;
+    iY = iY*CCFG::GAME_SIZE;
 	lMinion[getListID(iX)].push_back(new Plant(iX, iY, iLevelType == 0 || iLevelType == 4 ? 18 : 19));
 }
 
 void Map::addToad(int X, int Y, bool peach) {
+    X = X*CCFG::GAME_SIZE;
+    Y = Y*CCFG::GAME_SIZE;
 	lMinion[getListID(X)].push_back(new Toad(X, Y, peach));
 }
 
 void Map::addSquid(int X, int Y) {
+    X = X*CCFG::GAME_SIZE;
+    Y = Y*CCFG::GAME_SIZE;
 	lMinion[getListID(X)].push_back(new Squid(X, Y));
 }
 
 void Map::addHammer(int X, int Y, bool moveDirection) {
+    X = X*CCFG::GAME_SIZE;
+    Y = Y*CCFG::GAME_SIZE;
 	lMinion[getListID(X)].push_back(new Hammer(X, Y, moveDirection));
 }
 
 void Map::addHammerBro(int X, int Y) {
+    X = X*CCFG::GAME_SIZE;
+    Y = Y*CCFG::GAME_SIZE;
 	lMinion[getListID(X)].push_back(new HammerBro(X, Y));
 }
 
 void Map::addFireBall(int X, int Y, int iWidth, int iSliceID, bool DIR) {
+    X = X*CCFG::GAME_SIZE;
+    Y = Y*CCFG::GAME_SIZE;
 	for(int i = 0; i < iWidth; i++) {
-		lMinion[getListID((int)X)].push_back(new FireBall(X + 8, Y + 8, 14*i, iSliceID, DIR));
+        lMinion[getListID((int)X)].push_back(new FireBall(X + 8, Y + 8, 14*i, iSliceID, DIR));
 	}
 }
 
 void Map::addSpikey(int X, int Y) {
+    X = X*CCFG::GAME_SIZE;
+    Y = Y*CCFG::GAME_SIZE;
 	lMinion[getListID(X)].push_back(new Spikey(X, Y));
 }
 
 void Map::addPlayerFireBall(int X, int Y, bool moveDirection) {
+    X = X*CCFG::GAME_SIZE;
+    Y = Y*CCFG::GAME_SIZE;
 	lMinion[getListID(X)].push_back(new PlayerFireBall(X, Y, moveDirection));
 }
 
 void Map::addBowser(int X, int Y, bool spawnHammer) {
+    X = X*CCFG::GAME_SIZE;
+    Y = Y*CCFG::GAME_SIZE;
 	lMinion[getListID(X)].push_back(new Bowser((float)X, (float)Y, spawnHammer));
 }
 
 void Map::addUpFire(int X, int iYEnd) {
+    X = X*CCFG::GAME_SIZE;
+    iYEnd = iYEnd*CCFG::GAME_SIZE;
 	lMinion[getListID(X)].push_back(new UpFire(X, iYEnd));
 }
 
 void Map::addFire(float fX, float fY, int toYPos) {
+    fX = fX*CCFG::GAME_SIZE;
+    fY = fY*CCFG::GAME_SIZE;
 	lMinion[getListID((int)fX)].push_back(new Fire(fX, fY, toYPos));
 }
 
 void Map::addCheep(int X, int Y, int minionType, int moveSpeed, bool moveDirection) {
+    X = X*CCFG::GAME_SIZE;
+    Y = Y*CCFG::GAME_SIZE;
 	lMinion[getListID(X)].push_back(new Cheep(X, Y, minionType, moveSpeed, moveDirection));
 }
 
 void Map::addCheepSpawner(int X, int XEnd) {
+    X = X*CCFG::GAME_SIZE;
+    XEnd = XEnd*CCFG::GAME_SIZE;
 	lMinion[getListID(X)].push_back(new CheepSpawner(X, XEnd));
 }
 
 void Map::addBubble(int X, int Y) {
+    X = X*CCFG::GAME_SIZE;
+    Y = Y*CCFG::GAME_SIZE;
 	lBubble.push_back(new Bubble(X, Y));
 }
 
 void Map::addLakito(int X, int Y, int iMaxXPos) {
+    X = X*CCFG::GAME_SIZE;
+    Y = Y*CCFG::GAME_SIZE;
 	lMinion[getListID(X)].push_back(new Lakito(X, Y, iMaxXPos));
 }
 
 void Map::addVine(int X, int Y, int minionState, int iBlockID) {
+    X = X*CCFG::GAME_SIZE;
+    Y = Y*CCFG::GAME_SIZE;
 	lMinion[getListID(X)].push_back(new Vine(X, Y, minionState, iBlockID));
 	if(minionState == 0) {
 		CCFG::getMusic()->PlayChunk(CCFG::getMusic()->cVINE);
@@ -694,15 +734,21 @@ void Map::addVine(int X, int Y, int minionState, int iBlockID) {
 }
 
 void Map::addSpring(int X, int Y) {
+    X = X*CCFG::GAME_SIZE;
+    Y = Y*CCFG::GAME_SIZE;
 	lMinion[getListID(X)].push_back(new Spring(X, Y));
 	//lMap[X/32][(CCFG::GAME_HEIGHT - 16 - Y)/32 - 1]->setBlockID(83);
 }
 
 void Map::addBulletBillSpawner(int X, int Y, int minionState) {
+    X = X*CCFG::GAME_SIZE;
+    Y = Y*CCFG::GAME_SIZE;
 	lMinion[getListID(X*32)].push_back(new BulletBillSpawner(X*32, CCFG::GAME_HEIGHT - Y*32, minionState));
 }
 
 void Map::addBulletBill(int X, int Y, bool moveDirection, int minionState) {
+    X = X*CCFG::GAME_SIZE;
+    Y = Y*CCFG::GAME_SIZE;
 	lMinion[getListID(X)].push_back(new BulletBill(X, Y, moveDirection, minionState));
 }
 
@@ -2496,7 +2542,7 @@ void Map::loadMinionsLVL_1_2() {
 	addGoombas(29*32, 368, true);
 
 	addKoppa(44*32, 368, 1, true);
-	addKoppa(45*32 + 16, 368, 1, true);
+    addKoppa(45*32 + 16, 368, 1, true);
 
 	addKoppa(59*32, 368, 1, true);
 
@@ -2506,28 +2552,28 @@ void Map::loadMinionsLVL_1_2() {
 	addGoombas(73*32, 368 - 8*32, true);
 
 	addGoombas(76*32, 368 - 4*32, true);
-	addGoombas(77*32 + 16, 368 - 4*32, true);
+    addGoombas(77*32 + 16, 368 - 4*32, true);
 
 	addGoombas(99*32, 368, true);
-	addGoombas(100*32 + 16, 368, true);
+    addGoombas(100*32 + 16, 368, true);
 	addGoombas(102*32, 368, true);
 
 	addGoombas(113*32, 368, true);
 
 	addGoombas(135*32, 368 - 3*32, true);
-	addGoombas(136*32 + 16, 368 - 4*32, true);
+    addGoombas(136*32 + 16, 368 - 4*32, true);
 
 	this->iLevelType = 3;
 
 	addKoppa(146*32, 368, 1, false);
 
 	this->iLevelType = 1;
-	addPlant(103*32 + 16, CCFG::GAME_HEIGHT - 10 - 4*32);
-	addPlant(109*32 + 16, CCFG::GAME_HEIGHT - 10 - 5*32);
-	addPlant(115*32 + 16, CCFG::GAME_HEIGHT - 10 - 3*32);
+    addPlant(103*32 + 16, CCFG::GAME_HEIGHT - 10 - 4*32);
+    addPlant(109*32 + 16, CCFG::GAME_HEIGHT - 10 - 5*32);
+    addPlant(115*32 + 16, CCFG::GAME_HEIGHT - 10 - 3*32);
 
 	this->iLevelType = 0;
-	addPlant(284*32 + 16, CCFG::GAME_HEIGHT - 10 - 3*32);
+    addPlant(284*32 + 16, CCFG::GAME_HEIGHT - 10 - 3*32);
 
 	this->iLevelType = 1;
 }
@@ -2575,26 +2621,26 @@ void Map::loadMinionsLVL_2_1() {
 	addGoombas(24*32, CCFG::GAME_HEIGHT - 16 - 7*32, true);
 
 	addGoombas(42*32, CCFG::GAME_HEIGHT - 16 - 2*32, true);
-	addGoombas(43*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, true);
+    addGoombas(43*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, true);
 
 	addGoombas(59*32, CCFG::GAME_HEIGHT - 16 - 2*32, true);
-	addGoombas(60*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, true);
+    addGoombas(60*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, true);
 
 	addGoombas(68*32, CCFG::GAME_HEIGHT - 16 - 2*32, true);
-	addGoombas(69*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, true);
+    addGoombas(69*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, true);
 	addGoombas(71*32, CCFG::GAME_HEIGHT - 16 - 2*32, true);
 
 	addGoombas(87*32, CCFG::GAME_HEIGHT - 16 - 2*32, true);
-	addGoombas(88*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, true);
+    addGoombas(88*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, true);
 	addGoombas(90*32, CCFG::GAME_HEIGHT - 16 - 2*32, true);
 
-	addGoombas(102*32 + 16, CCFG::GAME_HEIGHT - 16 - 6*32, true);
-	addGoombas(114*32 + 16, CCFG::GAME_HEIGHT - 16 - 4*32, true);
+    addGoombas(102*32 + 16, CCFG::GAME_HEIGHT - 16 - 6*32, true);
+    addGoombas(114*32 + 16, CCFG::GAME_HEIGHT - 16 - 4*32, true);
 
-	addGoombas(120*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, true);
+    addGoombas(120*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, true);
 
 	addGoombas(162*32, CCFG::GAME_HEIGHT - 16 - 2*32, true);
-	addGoombas(163*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, true);
+    addGoombas(163*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, true);
 	
 	addKoppa(32*32 - 2, CCFG::GAME_HEIGHT - 16 - 2*32, 1, true);
 	addKoppa(33*32, CCFG::GAME_HEIGHT - 16 - 2*32, 1, true);
@@ -2609,13 +2655,13 @@ void Map::loadMinionsLVL_2_1() {
 
 	addKoppa(185*32, CCFG::GAME_HEIGHT - 16 - 2*32, 1, true);
 	
-	addPlant(46*32 + 16, CCFG::GAME_HEIGHT - 10 - 5*32);
-	addPlant(74*32 + 16, CCFG::GAME_HEIGHT - 10 - 5*32);
-	addPlant(103*32 + 16, CCFG::GAME_HEIGHT - 10 - 5*32);
-	addPlant(115*32 + 16, CCFG::GAME_HEIGHT - 10 - 3*32);
-	addPlant(122*32 + 16, CCFG::GAME_HEIGHT - 10 - 5*32);
-	addPlant(130*32 + 16, CCFG::GAME_HEIGHT - 10 - 6*32);
-	addPlant(176*32 + 16, CCFG::GAME_HEIGHT - 10 - 4*32);
+    addPlant(46*32 + 16, CCFG::GAME_HEIGHT - 10 - 5*32);
+    addPlant(74*32 + 16, CCFG::GAME_HEIGHT - 10 - 5*32);
+    addPlant(103*32 + 16, CCFG::GAME_HEIGHT - 10 - 5*32);
+    addPlant(115*32 + 16, CCFG::GAME_HEIGHT - 10 - 3*32);
+    addPlant(122*32 + 16, CCFG::GAME_HEIGHT - 10 - 5*32);
+    addPlant(130*32 + 16, CCFG::GAME_HEIGHT - 10 - 6*32);
+    addPlant(176*32 + 16, CCFG::GAME_HEIGHT - 10 - 4*32);
 }
 
 void Map::loadMinionsLVL_2_2() {
@@ -2637,17 +2683,17 @@ void Map::loadMinionsLVL_2_2() {
 	addCheep(117*32 + 8, CCFG::GAME_HEIGHT - 16 - 10*32, 0, 1);
 	addCheep(127*32 + 24, CCFG::GAME_HEIGHT - 16 - 4*32, 1, 1);
 	addCheep(131*32 + 8, CCFG::GAME_HEIGHT - 16 - 3*32 - 4, 0, 1);
-	addCheep(136*32 + 16, CCFG::GAME_HEIGHT - 16 - 6*32, 0, 1);
+    addCheep(136*32 + 16, CCFG::GAME_HEIGHT - 16 - 6*32, 0, 1);
 	addCheep(145*32 + 8, CCFG::GAME_HEIGHT - 16 - 4*32, 0, 1);
 	addCheep(149*32 + 28, CCFG::GAME_HEIGHT - 16 - 8*32 - 4, 1, 1);
 	addCheep(164*32, CCFG::GAME_HEIGHT - 16 - 11*32, 0, 1);
 	addCheep(167*32, CCFG::GAME_HEIGHT - 16 - 3*32, 1, 1);
 	addCheep(175*32, CCFG::GAME_HEIGHT - 16 - 6*32 - 4, 0, 1);
 	addCheep(183*32, CCFG::GAME_HEIGHT - 16 - 10*32, 1, 1);
-	addCheep(186*32 + 16, CCFG::GAME_HEIGHT - 16 - 7*32, 1, 1);
+    addCheep(186*32 + 16, CCFG::GAME_HEIGHT - 16 - 7*32, 1, 1);
 
 	this->iLevelType = 0;
-	addPlant(274*32 + 16, CCFG::GAME_HEIGHT - 10 - 3*32);
+    addPlant(274*32 + 16, CCFG::GAME_HEIGHT - 10 - 3*32);
 
 	this->iLevelType = 2;
 }
@@ -2683,24 +2729,24 @@ void Map::loadMinionsLVL_3_1() {
 
 	addGoombas(37*32, CCFG::GAME_HEIGHT - 16 - 2*32, true);
 	addGoombas(53*32, CCFG::GAME_HEIGHT - 16 - 2*32, true);
-	addGoombas(54*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, true);
+    addGoombas(54*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, true);
 	addGoombas(56*32, CCFG::GAME_HEIGHT - 16 - 2*32, true);
 	addGoombas(82*32, CCFG::GAME_HEIGHT - 16 - 6*32, true);
-	addGoombas(83*32 + 16, CCFG::GAME_HEIGHT - 16 - 6*32, true);
+    addGoombas(83*32 + 16, CCFG::GAME_HEIGHT - 16 - 6*32, true);
 	addGoombas(85*32, CCFG::GAME_HEIGHT - 16 - 6*32, true);
 	addGoombas(94*32, CCFG::GAME_HEIGHT - 16 - 2*32, true);
-	addGoombas(95*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, true);
+    addGoombas(95*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, true);
 	addGoombas(139*32 - 4, CCFG::GAME_HEIGHT - 16 - 6*32, true);
 	addGoombas(140*32, CCFG::GAME_HEIGHT - 16 - 7*32, true);
 	addGoombas(154*32, CCFG::GAME_HEIGHT - 16 - 2*32, true);
-	addGoombas(155*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, true);
+    addGoombas(155*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, true);
 	addGoombas(157*32, CCFG::GAME_HEIGHT - 16 - 2*32, true);
 
-	addPlant(32*32 + 16, CCFG::GAME_HEIGHT - 10 - 4*32);
-	addPlant(38*32 + 16, CCFG::GAME_HEIGHT - 10 - 5*32);
-	addPlant(57*32 + 16, CCFG::GAME_HEIGHT - 10 - 4*32);
-	addPlant(67*32 + 16, CCFG::GAME_HEIGHT - 10 - 3*32);
-	addPlant(103*32 + 16, CCFG::GAME_HEIGHT - 10 - 5*32);
+    addPlant(32*32 + 16, CCFG::GAME_HEIGHT - 10 - 4*32);
+    addPlant(38*32 + 16, CCFG::GAME_HEIGHT - 10 - 5*32);
+    addPlant(57*32 + 16, CCFG::GAME_HEIGHT - 10 - 4*32);
+    addPlant(67*32 + 16, CCFG::GAME_HEIGHT - 10 - 3*32);
+    addPlant(103*32 + 16, CCFG::GAME_HEIGHT - 10 - 5*32);
 
 	addKoppa(25*32, CCFG::GAME_HEIGHT - 16 - 2*32, 0, true);
 	addKoppa(28*32, CCFG::GAME_HEIGHT - 16 - 3*32, 0, true);
@@ -2724,42 +2770,42 @@ void Map::loadMinionsLVL_3_2() {
 
 	addKoppa(17*32, CCFG::GAME_HEIGHT - 16 - 2*32, 1, true);
 	addKoppa(33*32, CCFG::GAME_HEIGHT - 16 - 2*32, 1, true);
-	addKoppa(34*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, 1, true);
+    addKoppa(34*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, 1, true);
 	addKoppa(36*32, CCFG::GAME_HEIGHT - 16 - 2*32, 1, true);
 	addKoppa(43*32, CCFG::GAME_HEIGHT - 16 - 2*32, 1, true);
-	addKoppa(44*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, 1, true);
+    addKoppa(44*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, 1, true);
 	addKoppa(66*32, CCFG::GAME_HEIGHT - 16 - 2*32, 1, true);
 	addKoppa(78*32, CCFG::GAME_HEIGHT - 16 - 2*32, 1, true);
 	addKoppa(98*32, CCFG::GAME_HEIGHT - 16 - 2*32, 0, true);
 	addKoppa(111*32, CCFG::GAME_HEIGHT - 16 - 2*32, 1, true);
 	addKoppa(134*32, CCFG::GAME_HEIGHT - 16 - 2*32, 1, true);
 	addKoppa(140*32, CCFG::GAME_HEIGHT - 16 - 2*32, 1, true);
-	addKoppa(141*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, 1, true);
+    addKoppa(141*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, 1, true);
 	addKoppa(143*32, CCFG::GAME_HEIGHT - 16 - 2*32, 1, true);
 	addKoppa(150*32, CCFG::GAME_HEIGHT - 16 - 2*32, 1, true);
-	addKoppa(151*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, 1, true);
+    addKoppa(151*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, 1, true);
 	addKoppa(162*32, CCFG::GAME_HEIGHT - 16 - 2*32, 1, true);
-	addKoppa(163*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, 1, true);
+    addKoppa(163*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, 1, true);
 	addKoppa(165*32, CCFG::GAME_HEIGHT - 16 - 2*32, 1, true);
 	addKoppa(175*32, CCFG::GAME_HEIGHT - 16 - 2*32, 1, true);
 	
 	addGoombas(24*32, CCFG::GAME_HEIGHT - 16 - 2*32, true);
-	addGoombas(25*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, true);
+    addGoombas(25*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, true);
 	addGoombas(27*32, CCFG::GAME_HEIGHT - 16 - 2*32, true);
 	addGoombas(71*32, CCFG::GAME_HEIGHT - 16 - 2*32, true);
-	addGoombas(72*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, true);
+    addGoombas(72*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, true);
 	addGoombas(74*32, CCFG::GAME_HEIGHT - 16 - 2*32, true);
 	addGoombas(119*32, CCFG::GAME_HEIGHT - 16 - 2*32, true);
-	addGoombas(120*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, true);
+    addGoombas(120*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, true);
 	addGoombas(122*32, CCFG::GAME_HEIGHT - 16 - 2*32, true);
 	addGoombas(179*32, CCFG::GAME_HEIGHT - 16 - 2*32, true);
-	addGoombas(180*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, true);
+    addGoombas(180*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, true);
 	addGoombas(182*32, CCFG::GAME_HEIGHT - 16 - 2*32, true);
 	addGoombas(188*32, CCFG::GAME_HEIGHT - 16 - 2*32, true);
-	addGoombas(189*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, true);
+    addGoombas(189*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, true);
 	addGoombas(191*32, CCFG::GAME_HEIGHT - 16 - 2*32, true);
 
-	addPlant(169*32 + 16, CCFG::GAME_HEIGHT - 10 - 4*32);
+    addPlant(169*32 + 16, CCFG::GAME_HEIGHT - 10 - 4*32);
 }
 
 void Map::loadMinionsLVL_3_3() {
@@ -2809,10 +2855,10 @@ void Map::loadMinionsLVL_3_4() {
 void Map::loadMinionsLVL_4_1() {
 	clearMinions();
 
-	addPlant(21*32 + 16, CCFG::GAME_HEIGHT - 10 - 4*32);
-	addPlant(116*32 + 16, CCFG::GAME_HEIGHT - 10 - 5*32);
-	addPlant(132*32 + 16, CCFG::GAME_HEIGHT - 10 - 5*32);
-	addPlant(163*32 + 16, CCFG::GAME_HEIGHT - 10 - 3*32);
+    addPlant(21*32 + 16, CCFG::GAME_HEIGHT - 10 - 4*32);
+    addPlant(116*32 + 16, CCFG::GAME_HEIGHT - 10 - 5*32);
+    addPlant(132*32 + 16, CCFG::GAME_HEIGHT - 10 - 5*32);
+    addPlant(163*32 + 16, CCFG::GAME_HEIGHT - 10 - 3*32);
 
 	addLakito(26*32, CCFG::GAME_HEIGHT - 16 - 11*32, 207*32);
 }
@@ -2821,23 +2867,23 @@ void Map::loadMinionsLVL_4_2() {
 	clearMinions();
 
 	addGoombas(43*32, CCFG::GAME_HEIGHT - 16 - 6*32, true);
-	addGoombas(44*32 + 16, CCFG::GAME_HEIGHT - 16 - 6*32, true);
+    addGoombas(44*32 + 16, CCFG::GAME_HEIGHT - 16 - 6*32, true);
 	addGoombas(46*32, CCFG::GAME_HEIGHT - 16 - 6*32, true);
 
 	addKoppa(77*32, CCFG::GAME_HEIGHT - 16 - 2*32, 1, true);
 	addKoppa(100*32, CCFG::GAME_HEIGHT - 16 - 2*32, 1, true);
-	addKoppa(101*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, 1, true);
+    addKoppa(101*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, 1, true);
 	addKoppa(137*32, CCFG::GAME_HEIGHT - 16 - 2*32, 1, true);
 	addKoppa(168*32, CCFG::GAME_HEIGHT - 16 - 2*32, 1, true);
-	addKoppa(169*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, 1, true);
+    addKoppa(169*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, 1, true);
 
-	addPlant(72*32 + 16, CCFG::GAME_HEIGHT - 10 - 4*32);
-	addPlant(78*32 + 16, CCFG::GAME_HEIGHT - 10 - 8*32);
-	addPlant(84*32 + 16, CCFG::GAME_HEIGHT - 10 - 4*32);
-	addPlant(107*32 + 16, CCFG::GAME_HEIGHT - 10 - 5*32);
-	addPlant(138*32 + 16, CCFG::GAME_HEIGHT - 10 - 4*32);
-	addPlant(142*32 + 16, CCFG::GAME_HEIGHT - 10 - 5*32);
-	addPlant(180*32 + 16, CCFG::GAME_HEIGHT - 10 - 8*32);
+    addPlant(72*32 + 16, CCFG::GAME_HEIGHT - 10 - 4*32);
+    addPlant(78*32 + 16, CCFG::GAME_HEIGHT - 10 - 8*32);
+    addPlant(84*32 + 16, CCFG::GAME_HEIGHT - 10 - 4*32);
+    addPlant(107*32 + 16, CCFG::GAME_HEIGHT - 10 - 5*32);
+    addPlant(138*32 + 16, CCFG::GAME_HEIGHT - 10 - 4*32);
+    addPlant(142*32 + 16, CCFG::GAME_HEIGHT - 10 - 5*32);
+    addPlant(180*32 + 16, CCFG::GAME_HEIGHT - 10 - 8*32);
 
 	addBeetle(83*32, CCFG::GAME_HEIGHT - 16 - 2*32, true);
 	addBeetle(88*32, CCFG::GAME_HEIGHT - 16 - 2*32, true);
@@ -2846,7 +2892,7 @@ void Map::loadMinionsLVL_4_2() {
 
 	this->iLevelType = 0;
 
-	addPlant(394*32 + 16, CCFG::GAME_HEIGHT - 10 - 3*32);
+    addPlant(394*32 + 16, CCFG::GAME_HEIGHT - 10 - 3*32);
 
 	this->iLevelType = 1;
 }
@@ -2885,7 +2931,7 @@ void Map::loadMinionsLVL_4_4() {
 
 	this->iLevelType = 1;
 
-	addPlant(40*32 + 16, CCFG::GAME_HEIGHT - 10 - 4*32);
+    addPlant(40*32 + 16, CCFG::GAME_HEIGHT - 10 - 4*32);
 
 	this->iLevelType = 3;
 }
@@ -2894,41 +2940,41 @@ void Map::loadMinionsLVL_5_1() {
 	clearMinions();
 
 	addGoombas(19*32, CCFG::GAME_HEIGHT - 16 - 2*32, true);
-	addGoombas(20*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, true);
+    addGoombas(20*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, true);
 	addGoombas(22*32, CCFG::GAME_HEIGHT - 16 - 2*32, true);
 	addGoombas(30*32, CCFG::GAME_HEIGHT - 16 - 2*32, true);
-	addGoombas(31*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, true);
+    addGoombas(31*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, true);
 	addGoombas(33*32, CCFG::GAME_HEIGHT - 16 - 2*32, true);
 	addGoombas(65*32, CCFG::GAME_HEIGHT - 16 - 2*32, true);
-	addGoombas(66*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, true);
+    addGoombas(66*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, true);
 	addGoombas(68*32, CCFG::GAME_HEIGHT - 16 - 2*32, true);
 	addGoombas(76*32, CCFG::GAME_HEIGHT - 16 - 2*32, true);
-	addGoombas(77*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, true);
+    addGoombas(77*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, true);
 	addGoombas(103*32, CCFG::GAME_HEIGHT - 16 - 2*32, true);
-	addGoombas(104*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, true);
+    addGoombas(104*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, true);
 	addGoombas(106*32, CCFG::GAME_HEIGHT - 16 - 2*32, true);
 	addGoombas(121*32, CCFG::GAME_HEIGHT - 16 - 2*32, true);
-	addGoombas(122*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, true);
+    addGoombas(122*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, true);
 	addGoombas(124*32, CCFG::GAME_HEIGHT - 16 - 2*32, true);
 	addGoombas(135*32, CCFG::GAME_HEIGHT - 16 - 2*32, true);
-	addGoombas(136*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, true);
+    addGoombas(136*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, true);
 	addGoombas(138*32, CCFG::GAME_HEIGHT - 16 - 2*32, true);
 	
 	addKoppa(16*32, CCFG::GAME_HEIGHT - 16 - 2*32, 1, true);
 	addKoppa(41*32, CCFG::GAME_HEIGHT - 16 - 2*32, 1, true);
-	addKoppa(42*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, 1, true);
+    addKoppa(42*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, 1, true);
 	addKoppa(61*32, CCFG::GAME_HEIGHT - 16 - 3*32, 0, true);
 	addKoppa(87*32, CCFG::GAME_HEIGHT - 16 - 3*32, 0, true);
 	addKoppa(127*32, CCFG::GAME_HEIGHT - 16 - 2*32, 1, true);
 	addKoppa(144*32, CCFG::GAME_HEIGHT - 16 - 2*32, 1, true);
-	addKoppa(145*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, 1, true);
+    addKoppa(145*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, 1, true);
 	addKoppa(178*32, CCFG::GAME_HEIGHT - 16 - 2*32, 0, true);
 	addKoppa(182*32, CCFG::GAME_HEIGHT - 16 - 6*32, 1, true);
 
-	addPlant(44*32 + 16, CCFG::GAME_HEIGHT - 10 - 4*32);
-	addPlant(51*32 + 16, CCFG::GAME_HEIGHT - 10 - 4*32);
-	addPlant(156*32 + 16, CCFG::GAME_HEIGHT - 10 - 7*32);
-	addPlant(163*32 + 16, CCFG::GAME_HEIGHT - 10 - 3*32);
+    addPlant(44*32 + 16, CCFG::GAME_HEIGHT - 10 - 4*32);
+    addPlant(51*32 + 16, CCFG::GAME_HEIGHT - 10 - 4*32);
+    addPlant(156*32 + 16, CCFG::GAME_HEIGHT - 10 - 7*32);
+    addPlant(163*32 + 16, CCFG::GAME_HEIGHT - 10 - 3*32);
 	
 }
 
@@ -2938,7 +2984,7 @@ void Map::loadMinionsLVL_5_2() {
 	addGoombas(143*32, CCFG::GAME_HEIGHT - 16 - 4*32, true);
 	addGoombas(145*32, CCFG::GAME_HEIGHT - 16 - 6*32, true);
 	addGoombas(235*32, CCFG::GAME_HEIGHT - 16 - 2*32, true);
-	addGoombas(236*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, true);
+    addGoombas(236*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, true);
 
 	addKoppa(103*32, CCFG::GAME_HEIGHT - 16 - 2*32, 1, true);
 	addKoppa(120*32, CCFG::GAME_HEIGHT - 16 - 3*32, 0, true);
@@ -2952,8 +2998,8 @@ void Map::loadMinionsLVL_5_2() {
 	addHammerBro(200*32, CCFG::GAME_HEIGHT - 16 - 7*32);
 	addHammerBro(204*32, CCFG::GAME_HEIGHT - 16 - 11*32);
 
-	addPlant(135*32 + 16, CCFG::GAME_HEIGHT - 10 - 4*32);
-	addPlant(195*32 + 16, CCFG::GAME_HEIGHT - 10 - 3*32);
+    addPlant(135*32 + 16, CCFG::GAME_HEIGHT - 10 - 4*32);
+    addPlant(195*32 + 16, CCFG::GAME_HEIGHT - 10 - 3*32);
 
 	addBeetle(216*32, CCFG::GAME_HEIGHT - 16 - 2*32, true);
 	addBeetle(217*32 + 4, CCFG::GAME_HEIGHT - 16 - 2*32, true);
@@ -2969,12 +3015,12 @@ void Map::loadMinionsLVL_5_2() {
 
 	addSquid(17*32, CCFG::GAME_HEIGHT - 16 - 4*32);
 	addSquid(34*32, CCFG::GAME_HEIGHT - 16 - 4*32);
-	addSquid(43*32 + 16, CCFG::GAME_HEIGHT - 16 - 4*32);
+    addSquid(43*32 + 16, CCFG::GAME_HEIGHT - 16 - 4*32);
 
-	addCheep(27*32 + 16, CCFG::GAME_HEIGHT - 9*32, 0, 1);
+    addCheep(27*32 + 16, CCFG::GAME_HEIGHT - 9*32, 0, 1);
 	addCheep(38*32 + 28, CCFG::GAME_HEIGHT - 4*32, 0, 1);
-	addCheep(48*32 + 16, CCFG::GAME_HEIGHT - 6*32, 1, 1);
-	addCheep(53*32 + 16, CCFG::GAME_HEIGHT - 11*32, 0, 1);
+    addCheep(48*32 + 16, CCFG::GAME_HEIGHT - 6*32, 1, 1);
+    addCheep(53*32 + 16, CCFG::GAME_HEIGHT - 11*32, 0, 1);
 }
 
 void Map::loadMinionsLVL_5_3() {
@@ -3035,7 +3081,7 @@ void Map::loadMinionsLVL_6_1() {
 
 	addLakito(23*32, CCFG::GAME_HEIGHT - 16 - 11*32, 176*32);
 
-	addPlant(102*32 + 16, CCFG::GAME_HEIGHT - 10 - 4*32);
+    addPlant(102*32 + 16, CCFG::GAME_HEIGHT - 10 - 4*32);
 
 	this->iLevelType = 4;
 }
@@ -3045,43 +3091,43 @@ void Map::loadMinionsLVL_6_2() {
 
 	addSquid(17*32, CCFG::GAME_HEIGHT - 16 - 4*32);
 	addSquid(34*32, CCFG::GAME_HEIGHT - 16 - 4*32);
-	addSquid(43*32 + 16, CCFG::GAME_HEIGHT - 16 - 4*32);
+    addSquid(43*32 + 16, CCFG::GAME_HEIGHT - 16 - 4*32);
 
-	addCheep(27*32 + 16, CCFG::GAME_HEIGHT - 9*32, 0, 1);
+    addCheep(27*32 + 16, CCFG::GAME_HEIGHT - 9*32, 0, 1);
 	addCheep(38*32 + 28, CCFG::GAME_HEIGHT - 4*32, 0, 1);
-	addCheep(48*32 + 16, CCFG::GAME_HEIGHT - 6*32, 1, 1);
-	addCheep(53*32 + 16, CCFG::GAME_HEIGHT - 11*32, 0, 1);
+    addCheep(48*32 + 16, CCFG::GAME_HEIGHT - 6*32, 1, 1);
+    addCheep(53*32 + 16, CCFG::GAME_HEIGHT - 11*32, 0, 1);
 
 	addKoppa(111*32, CCFG::GAME_HEIGHT - 16 - 2*32, 1, true);
 	addKoppa(128*32, CCFG::GAME_HEIGHT - 16 - 3*32, 0, true);
 	addKoppa(291*32, CCFG::GAME_HEIGHT - 16 - 11*32, 0, true);
 
-	addPlant(104*32 + 16, CCFG::GAME_HEIGHT - 10 - 5*32);
-	addPlant(113*32 + 16, CCFG::GAME_HEIGHT - 10 - 5*32);
-	addPlant(117*32 + 16, CCFG::GAME_HEIGHT - 10 - 8*32);
-	addPlant(120*32 + 16, CCFG::GAME_HEIGHT - 10 - 3*32);
-	addPlant(122*32 + 16, CCFG::GAME_HEIGHT - 10 - 3*32);
-	addPlant(131*32 + 16, CCFG::GAME_HEIGHT - 10 - 5*32);
-	addPlant(141*32 + 16, CCFG::GAME_HEIGHT - 10 - 6*32);
-	addPlant(147*32 + 16, CCFG::GAME_HEIGHT - 10 - 7*32);
-	addPlant(152*32 + 16, CCFG::GAME_HEIGHT - 10 - 3*32);
-	addPlant(165*32 + 16, CCFG::GAME_HEIGHT - 10 - 4*32);
-	addPlant(169*32 + 16, CCFG::GAME_HEIGHT - 10 - 3*32);
-	addPlant(172*32 + 16, CCFG::GAME_HEIGHT - 10 - 7*32);
-	addPlant(179*32 + 16, CCFG::GAME_HEIGHT - 10 - 4*32);
-	addPlant(190*32 + 16, CCFG::GAME_HEIGHT - 10 - 3*32);
-	addPlant(196*32 + 16, CCFG::GAME_HEIGHT - 10 - 8*32);
-	addPlant(200*32 + 16, CCFG::GAME_HEIGHT - 10 - 3*32);
-	addPlant(216*32 + 16, CCFG::GAME_HEIGHT - 10 - 3*32);
-	addPlant(220*32 + 16, CCFG::GAME_HEIGHT - 10 - 3*32);
-	addPlant(238*32 + 16, CCFG::GAME_HEIGHT - 10 - 4*32);
-	addPlant(252*32 + 16, CCFG::GAME_HEIGHT - 10 - 8*32);
-	addPlant(259*32 + 16, CCFG::GAME_HEIGHT - 10 - 5*32);
-	addPlant(264*32 + 16, CCFG::GAME_HEIGHT - 10 - 3*32);
-	addPlant(266*32 + 16, CCFG::GAME_HEIGHT - 10 - 4*32);
-	addPlant(268*32 + 16, CCFG::GAME_HEIGHT - 10 - 5*32);
-	addPlant(274*32 + 16, CCFG::GAME_HEIGHT - 10 - 4*32);
-	addPlant(286*32 + 16, CCFG::GAME_HEIGHT - 10 - 5*32);
+    addPlant(104*32 + 16, CCFG::GAME_HEIGHT - 10 - 5*32);
+    addPlant(113*32 + 16, CCFG::GAME_HEIGHT - 10 - 5*32);
+    addPlant(117*32 + 16, CCFG::GAME_HEIGHT - 10 - 8*32);
+    addPlant(120*32 + 16, CCFG::GAME_HEIGHT - 10 - 3*32);
+    addPlant(122*32 + 16, CCFG::GAME_HEIGHT - 10 - 3*32);
+    addPlant(131*32 + 16, CCFG::GAME_HEIGHT - 10 - 5*32);
+    addPlant(141*32 + 16, CCFG::GAME_HEIGHT - 10 - 6*32);
+    addPlant(147*32 + 16, CCFG::GAME_HEIGHT - 10 - 7*32);
+    addPlant(152*32 + 16, CCFG::GAME_HEIGHT - 10 - 3*32);
+    addPlant(165*32 + 16, CCFG::GAME_HEIGHT - 10 - 4*32);
+    addPlant(169*32 + 16, CCFG::GAME_HEIGHT - 10 - 3*32);
+    addPlant(172*32 + 16, CCFG::GAME_HEIGHT - 10 - 7*32);
+    addPlant(179*32 + 16, CCFG::GAME_HEIGHT - 10 - 4*32);
+    addPlant(190*32 + 16, CCFG::GAME_HEIGHT - 10 - 3*32);
+    addPlant(196*32 + 16, CCFG::GAME_HEIGHT - 10 - 8*32);
+    addPlant(200*32 + 16, CCFG::GAME_HEIGHT - 10 - 3*32);
+    addPlant(216*32 + 16, CCFG::GAME_HEIGHT - 10 - 3*32);
+    addPlant(220*32 + 16, CCFG::GAME_HEIGHT - 10 - 3*32);
+    addPlant(238*32 + 16, CCFG::GAME_HEIGHT - 10 - 4*32);
+    addPlant(252*32 + 16, CCFG::GAME_HEIGHT - 10 - 8*32);
+    addPlant(259*32 + 16, CCFG::GAME_HEIGHT - 10 - 5*32);
+    addPlant(264*32 + 16, CCFG::GAME_HEIGHT - 10 - 3*32);
+    addPlant(266*32 + 16, CCFG::GAME_HEIGHT - 10 - 4*32);
+    addPlant(268*32 + 16, CCFG::GAME_HEIGHT - 10 - 5*32);
+    addPlant(274*32 + 16, CCFG::GAME_HEIGHT - 10 - 4*32);
+    addPlant(286*32 + 16, CCFG::GAME_HEIGHT - 10 - 5*32);
 	
 
 	addBeetle(139*32, CCFG::GAME_HEIGHT - 16 - 2*32, true);
@@ -3137,11 +3183,11 @@ void Map::loadMinionsLVL_7_1() {
 
 	addKoppa(114*32, CCFG::GAME_HEIGHT - 16 - 2*32, 1, true);
 
-	addPlant(76*32 + 16, CCFG::GAME_HEIGHT - 10 - 4*32);
-	addPlant(93*32 + 16, CCFG::GAME_HEIGHT - 10 - 4*32);
-	addPlant(109*32 + 16, CCFG::GAME_HEIGHT - 10 - 4*32);
-	addPlant(115*32 + 16, CCFG::GAME_HEIGHT - 10 - 3*32);
-	addPlant(128*32 + 16, CCFG::GAME_HEIGHT - 10 - 3*32);
+    addPlant(76*32 + 16, CCFG::GAME_HEIGHT - 10 - 4*32);
+    addPlant(93*32 + 16, CCFG::GAME_HEIGHT - 10 - 4*32);
+    addPlant(109*32 + 16, CCFG::GAME_HEIGHT - 10 - 4*32);
+    addPlant(115*32 + 16, CCFG::GAME_HEIGHT - 10 - 3*32);
+    addPlant(128*32 + 16, CCFG::GAME_HEIGHT - 10 - 3*32);
 
 	addHammerBro(85*32, CCFG::GAME_HEIGHT - 16 - 7*32);
 	addHammerBro(87*32, CCFG::GAME_HEIGHT - 16 - 11*32);
@@ -3177,17 +3223,17 @@ void Map::loadMinionsLVL_7_2() {
 	addCheep(117*32 + 8, CCFG::GAME_HEIGHT - 16 - 10*32, 0, 1);
 	addCheep(127*32 + 24, CCFG::GAME_HEIGHT - 16 - 4*32, 1, 1);
 	addCheep(131*32 + 8, CCFG::GAME_HEIGHT - 16 - 3*32 - 4, 0, 1);
-	addCheep(136*32 + 16, CCFG::GAME_HEIGHT - 16 - 6*32, 0, 1);
+    addCheep(136*32 + 16, CCFG::GAME_HEIGHT - 16 - 6*32, 0, 1);
 	addCheep(145*32 + 8, CCFG::GAME_HEIGHT - 16 - 4*32, 0, 1);
 	addCheep(149*32 + 28, CCFG::GAME_HEIGHT - 16 - 8*32 - 4, 1, 1);
 	addCheep(164*32, CCFG::GAME_HEIGHT - 16 - 11*32, 0, 1);
 	addCheep(167*32, CCFG::GAME_HEIGHT - 16 - 3*32, 1, 1);
 	addCheep(175*32, CCFG::GAME_HEIGHT - 16 - 6*32 - 4, 0, 1);
 	addCheep(183*32, CCFG::GAME_HEIGHT - 16 - 10*32, 1, 1);
-	addCheep(186*32 + 16, CCFG::GAME_HEIGHT - 16 - 7*32, 1, 1);
+    addCheep(186*32 + 16, CCFG::GAME_HEIGHT - 16 - 7*32, 1, 1);
 
 	this->iLevelType = 0;
-	addPlant(274*32 + 16, CCFG::GAME_HEIGHT - 10 - 3*32);
+    addPlant(274*32 + 16, CCFG::GAME_HEIGHT - 10 - 3*32);
 
 	this->iLevelType = 2;
 }
@@ -3227,51 +3273,51 @@ void Map::loadMinionsLVL_8_1() {
 	clearMinions();
 
 	addGoombas(23*32, CCFG::GAME_HEIGHT - 16 - 2*32, true);
-	addGoombas(24*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, true);
+    addGoombas(24*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, true);
 	addGoombas(26*32, CCFG::GAME_HEIGHT - 16 - 2*32, true);
 	addGoombas(30*32, CCFG::GAME_HEIGHT - 16 - 2*32, true);
-	addGoombas(31*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, true);
+    addGoombas(31*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, true);
 	addGoombas(33*32, CCFG::GAME_HEIGHT - 16 - 2*32, true);
 	addGoombas(69*32, CCFG::GAME_HEIGHT - 16 - 2*32, true);
-	addGoombas(70*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, true);
+    addGoombas(70*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, true);
 	addGoombas(72*32, CCFG::GAME_HEIGHT - 16 - 2*32, true);
 	addGoombas(108*32, CCFG::GAME_HEIGHT - 16 - 2*32, true);
-	addGoombas(109*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, true);
+    addGoombas(109*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, true);
 	addGoombas(111*32, CCFG::GAME_HEIGHT - 16 - 2*32, true);
 	addGoombas(148*32, CCFG::GAME_HEIGHT - 16 - 2*32, true);
-	addGoombas(149*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, true);
+    addGoombas(149*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, true);
 	addGoombas(151*32, CCFG::GAME_HEIGHT - 16 - 2*32, true);
 	addGoombas(232*32, CCFG::GAME_HEIGHT - 16 - 2*32, true);
-	addGoombas(233*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, true);
+    addGoombas(233*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, true);
 	addGoombas(235*32, CCFG::GAME_HEIGHT - 16 - 2*32, true);
 	addGoombas(257*32, CCFG::GAME_HEIGHT - 16 - 2*32, true);
-	addGoombas(258*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, true);
+    addGoombas(258*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, true);
 	addGoombas(260*32, CCFG::GAME_HEIGHT - 16 - 2*32, true);
 	addGoombas(264*32, CCFG::GAME_HEIGHT - 16 - 2*32, true);
-	addGoombas(265*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, true);
+    addGoombas(265*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, true);
 	addGoombas(267*32, CCFG::GAME_HEIGHT - 16 - 2*32, true);
 	addGoombas(272*32, CCFG::GAME_HEIGHT - 16 - 2*32, true);
-	addGoombas(273*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, true);
+    addGoombas(273*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, true);
 
 	addKoppa(43*32, CCFG::GAME_HEIGHT - 16 - 2*32, 1, true);
-	addKoppa(44*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, 1, true);
+    addKoppa(44*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, 1, true);
 	addKoppa(61*32, CCFG::GAME_HEIGHT - 16 - 2*32, 1, true);
 	addKoppa(119*32, CCFG::GAME_HEIGHT - 16 - 2*32, 1, true);
 	addKoppa(124*32, CCFG::GAME_HEIGHT - 16 - 2*32, 1, true);
-	addKoppa(125*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, 1, true);
+    addKoppa(125*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, 1, true);
 	addKoppa(127*32, CCFG::GAME_HEIGHT - 16 - 2*32, 1, true);
 	addKoppa(130*32, CCFG::GAME_HEIGHT - 16 - 2*32, 1, true);
-	addKoppa(131*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, 1, true);
+    addKoppa(131*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, 1, true);
 	addKoppa(133*32, CCFG::GAME_HEIGHT - 16 - 2*32, 1, true);
 	addKoppa(161*32, CCFG::GAME_HEIGHT - 16 - 3*32, 0, true);
 	addKoppa(172*32, CCFG::GAME_HEIGHT - 16 - 4*32, 0, true);
 	addKoppa(177*32, CCFG::GAME_HEIGHT - 16 - 2*32, 1, true);
 	addKoppa(207*32, CCFG::GAME_HEIGHT - 16 - 2*32, 1, true);
-	addKoppa(208*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, 1, true);
+    addKoppa(208*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, 1, true);
 	addKoppa(305*32, CCFG::GAME_HEIGHT - 16 - 2*32, 1, true);
 	addKoppa(332*32, CCFG::GAME_HEIGHT - 16 - 2*32, 1, true);
 	addKoppa(339*32, CCFG::GAME_HEIGHT - 16 - 2*32, 1, true);
-	addKoppa(340*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, 1, true);
+    addKoppa(340*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, 1, true);
 	addKoppa(342*32, CCFG::GAME_HEIGHT - 16 - 2*32, 1, true);
 
 
@@ -3280,16 +3326,16 @@ void Map::loadMinionsLVL_8_1() {
 	addBeetle(254*32, CCFG::GAME_HEIGHT - 16 - 2*32, true);
 	addBeetle(283*32, CCFG::GAME_HEIGHT - 16 - 2*32, true);
 
-	addPlant(35*32 + 16, CCFG::GAME_HEIGHT - 10 - 5*32);
-	addPlant(76*32 + 16, CCFG::GAME_HEIGHT - 10 - 5*32);
-	addPlant(82*32 + 16, CCFG::GAME_HEIGHT - 10 - 4*32);
-	addPlant(94*32 + 16, CCFG::GAME_HEIGHT - 10 - 5*32);
-	addPlant(104*32 + 16, CCFG::GAME_HEIGHT - 10 - 5*32);
-	addPlant(140*32 + 16, CCFG::GAME_HEIGHT - 10 - 4*32);
-	addPlant(238*32 + 16, CCFG::GAME_HEIGHT - 10 - 4*32);
-	addPlant(242*32 + 16, CCFG::GAME_HEIGHT - 10 - 5*32);
-	addPlant(344*32 + 16, CCFG::GAME_HEIGHT - 10 - 4*32);
-	addPlant(355*32 + 16, CCFG::GAME_HEIGHT - 10 - 3*32);
+    addPlant(35*32 + 16, CCFG::GAME_HEIGHT - 10 - 5*32);
+    addPlant(76*32 + 16, CCFG::GAME_HEIGHT - 10 - 5*32);
+    addPlant(82*32 + 16, CCFG::GAME_HEIGHT - 10 - 4*32);
+    addPlant(94*32 + 16, CCFG::GAME_HEIGHT - 10 - 5*32);
+    addPlant(104*32 + 16, CCFG::GAME_HEIGHT - 10 - 5*32);
+    addPlant(140*32 + 16, CCFG::GAME_HEIGHT - 10 - 4*32);
+    addPlant(238*32 + 16, CCFG::GAME_HEIGHT - 10 - 4*32);
+    addPlant(242*32 + 16, CCFG::GAME_HEIGHT - 10 - 5*32);
+    addPlant(344*32 + 16, CCFG::GAME_HEIGHT - 10 - 4*32);
+    addPlant(355*32 + 16, CCFG::GAME_HEIGHT - 10 - 3*32);
 }
 
 void Map::loadMinionsLVL_8_2() {
@@ -3318,11 +3364,11 @@ void Map::loadMinionsLVL_8_2() {
 
 	addLakito(16*32, CCFG::GAME_HEIGHT - 16 - 11*32, 216*32);
 
-	addPlant(131*32 + 16, CCFG::GAME_HEIGHT - 10 - 3*32);
-	addPlant(142*32 + 16, CCFG::GAME_HEIGHT - 10 - 3*32);
-	addPlant(156*32 + 16, CCFG::GAME_HEIGHT - 10 - 5*32);
-	addPlant(163*32 + 16, CCFG::GAME_HEIGHT - 10 - 3*32);
-	addPlant(131*32 + 16, CCFG::GAME_HEIGHT - 10 - 3*32);
+    addPlant(131*32 + 16, CCFG::GAME_HEIGHT - 10 - 3*32);
+    addPlant(142*32 + 16, CCFG::GAME_HEIGHT - 10 - 3*32);
+    addPlant(156*32 + 16, CCFG::GAME_HEIGHT - 10 - 5*32);
+    addPlant(163*32 + 16, CCFG::GAME_HEIGHT - 10 - 3*32);
+    addPlant(131*32 + 16, CCFG::GAME_HEIGHT - 10 - 3*32);
 }
 
 void Map::loadMinionsLVL_8_3() {
@@ -3332,9 +3378,9 @@ void Map::loadMinionsLVL_8_3() {
 	addKoppa(93*32, CCFG::GAME_HEIGHT - 16 - 3*32, 0, true);
 	addKoppa(137*32, CCFG::GAME_HEIGHT - 16 - 2*32, 1, true);
 
-	addPlant(53*32 + 16, CCFG::GAME_HEIGHT - 10 - 5*32);
-	addPlant(126*32 + 16, CCFG::GAME_HEIGHT - 10 - 5*32);
-	addPlant(168*32 + 16, CCFG::GAME_HEIGHT - 10 - 4*32);
+    addPlant(53*32 + 16, CCFG::GAME_HEIGHT - 10 - 5*32);
+    addPlant(126*32 + 16, CCFG::GAME_HEIGHT - 10 - 5*32);
+    addPlant(168*32 + 16, CCFG::GAME_HEIGHT - 10 - 4*32);
 
 	addHammerBro(63*32, CCFG::GAME_HEIGHT - 16 - 3*32);
 	addHammerBro(65*32, CCFG::GAME_HEIGHT - 16 - 7*32);
@@ -3349,26 +3395,26 @@ void Map::loadMinionsLVL_8_3() {
 void Map::loadMinionsLVL_8_4() {
 	clearMinions();
 
-	addPlant(19*32 + 16, CCFG::GAME_HEIGHT - 10 - 3*32);
-	addPlant(51*32 + 16, CCFG::GAME_HEIGHT - 10 - 3*32);
-	addPlant(81*32 + 16, CCFG::GAME_HEIGHT - 10 - 6*32);
-	addPlant(126*32 + 16, CCFG::GAME_HEIGHT - 10 - 3*32);
-	addPlant(133*32 + 16, CCFG::GAME_HEIGHT - 10 - 4*32);
-	addPlant(143*32 + 16, CCFG::GAME_HEIGHT - 10 - 3*32);
-	addPlant(153*32 + 16, CCFG::GAME_HEIGHT - 10 - 4*32);
-	addPlant(163*32 + 16, CCFG::GAME_HEIGHT - 10 - 8*32);
-	addPlant(215*32 + 16, CCFG::GAME_HEIGHT - 10 - 3*32);
-	addPlant(302*32 + 16, CCFG::GAME_HEIGHT - 10 - 3*32);
-	addPlant(224*32 + 16, CCFG::GAME_HEIGHT - 10 - 6*32);
-	addPlant(232*32 + 16, CCFG::GAME_HEIGHT - 10 - 7*32);
-	addPlant(248*32 + 16, CCFG::GAME_HEIGHT - 10 - 6*32);
-	addPlant(309*32 + 16, CCFG::GAME_HEIGHT - 10 - 3*32);
+    addPlant(19*32 + 16, CCFG::GAME_HEIGHT - 10 - 3*32);
+    addPlant(51*32 + 16, CCFG::GAME_HEIGHT - 10 - 3*32);
+    addPlant(81*32 + 16, CCFG::GAME_HEIGHT - 10 - 6*32);
+    addPlant(126*32 + 16, CCFG::GAME_HEIGHT - 10 - 3*32);
+    addPlant(133*32 + 16, CCFG::GAME_HEIGHT - 10 - 4*32);
+    addPlant(143*32 + 16, CCFG::GAME_HEIGHT - 10 - 3*32);
+    addPlant(153*32 + 16, CCFG::GAME_HEIGHT - 10 - 4*32);
+    addPlant(163*32 + 16, CCFG::GAME_HEIGHT - 10 - 8*32);
+    addPlant(215*32 + 16, CCFG::GAME_HEIGHT - 10 - 3*32);
+    addPlant(302*32 + 16, CCFG::GAME_HEIGHT - 10 - 3*32);
+    addPlant(224*32 + 16, CCFG::GAME_HEIGHT - 10 - 6*32);
+    addPlant(232*32 + 16, CCFG::GAME_HEIGHT - 10 - 7*32);
+    addPlant(248*32 + 16, CCFG::GAME_HEIGHT - 10 - 6*32);
+    addPlant(309*32 + 16, CCFG::GAME_HEIGHT - 10 - 3*32);
 
 	addBeetle(139*32, CCFG::GAME_HEIGHT - 16 - 2*32, true);
 	addBeetle(141*32, CCFG::GAME_HEIGHT - 16 - 2*32, true);
 
 	addGoombas(56*32, CCFG::GAME_HEIGHT - 16 - 2*32, true);
-	addGoombas(57*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, true);
+    addGoombas(57*32 + 16, CCFG::GAME_HEIGHT - 16 - 2*32, true);
 	addGoombas(59*32, CCFG::GAME_HEIGHT - 16 - 2*32, true);
 
 	addHammerBro(316*32, CCFG::GAME_HEIGHT - 16 - 3*32);
@@ -3901,8 +3947,8 @@ void Map::loadPipeEventsLVL_8_4() {
 void Map::loadLVL_1_1() {
 	clearMap();
 
-	this->iMapWidth = 260;
-	this->iMapHeight = 25;
+    this->iMapWidth = 260;
+    this->iMapHeight = 25;
 	this->iLevelType = 0;
 	this->iMapTime = 400;
 
@@ -3917,7 +3963,7 @@ void Map::loadLVL_1_1() {
 
 	// ----- Bush -----
 
-	structBush(0, 2, 2);
+    structBush(0, 2, 2);
 	structBush(16, 2, 1);
 	structBush(48, 2, 2);
 	structBush(64, 2, 1);
@@ -3974,13 +4020,13 @@ void Map::loadLVL_1_1() {
 
 	// ----- GND -----
 
-	structGND(0, 0, 69, 2);
+    structGND(0, 0, 69, 2);
 
-	structGND(71, 0, 15, 2);
+    structGND(71, 0, 15, 2);
 
-	structGND(89, 0, 64, 2);
+    structGND(89, 0, 64, 2);
 
-	structGND(155, 0, 85, 2);
+    structGND(155, 0, 85, 2);
 
 	// ----- GND -----
 
@@ -4108,17 +4154,17 @@ void Map::loadLVL_1_2() {
 	// ----- PIPEEVENTS
 	loadPipeEventsLVL_1_2();
 
-	vPlatform.push_back(new Platform(6, 0, 139*32 + 16, 139*32 + 16, -32, CCFG::GAME_HEIGHT + 32, 139*32 + 16, 9*32 + 16, true));
-	vPlatform.push_back(new Platform(6, 0, 139*32 + 16, 139*32 + 16, -32, CCFG::GAME_HEIGHT + 32, 139*32 + 16, 1*32 + 16, true));
+    vPlatform.push_back(new Platform(6, 0, 139*32 + 16, 139*32 + 16, -32, CCFG::GAME_HEIGHT + 32, 139*32 + 16, 9*32 + 16, true));
+    vPlatform.push_back(new Platform(6, 0, 139*32 + 16, 139*32 + 16, -32, CCFG::GAME_HEIGHT + 32, 139*32 + 16, 1*32 + 16, true));
 
-	vPlatform.push_back(new Platform(6, 1, 154*32 + 16, 154*32 + 16, -32, CCFG::GAME_HEIGHT + 32, 154*32 + 16, 10*32, true));
-	vPlatform.push_back(new Platform(6, 1, 154*32 + 16, 154*32 + 16, -32, CCFG::GAME_HEIGHT + 32, 154*32 + 16, 2*32, true));
+    vPlatform.push_back(new Platform(6, 1, 154*32 + 16, 154*32 + 16, -32, CCFG::GAME_HEIGHT + 32, 154*32 + 16, 10*32, true));
+    vPlatform.push_back(new Platform(6, 1, 154*32 + 16, 154*32 + 16, -32, CCFG::GAME_HEIGHT + 32, 154*32 + 16, 2*32, true));
 
 	vLevelText.push_back(new LevelText(178*32, CCFG::GAME_HEIGHT - 16 - 8*32, "WELCOME TO WARP ZONEz"));
 
-	vLevelText.push_back(new LevelText(178*32 + 16, CCFG::GAME_HEIGHT - 6*32, "4"));
-	vLevelText.push_back(new LevelText(182*32 + 16, CCFG::GAME_HEIGHT - 6*32, "3"));
-	vLevelText.push_back(new LevelText(186*32 + 16, CCFG::GAME_HEIGHT - 6*32, "2"));
+    vLevelText.push_back(new LevelText(178*32 + 16, CCFG::GAME_HEIGHT - 6*32, "4"));
+    vLevelText.push_back(new LevelText(182*32 + 16, CCFG::GAME_HEIGHT - 6*32, "3"));
+    vLevelText.push_back(new LevelText(186*32 + 16, CCFG::GAME_HEIGHT - 6*32, "2"));
 
 	// ----- GND -----
 
@@ -4326,11 +4372,11 @@ void Map::loadLVL_1_3() {
 
 	vPlatform.push_back(new Platform(6, 2, 55*32, 55*32, CCFG::GAME_HEIGHT - 16 - 9*32, CCFG::GAME_HEIGHT - 32, 55*32, (float)CCFG::GAME_HEIGHT - 32, true));
 
-	vPlatform.push_back(new Platform(6, 3, 83*32 - 16, 86*32 + 16, CCFG::GAME_HEIGHT - 16 - 6*32, CCFG::GAME_HEIGHT - 16 - 6*32, 83*32 - 16, (float)CCFG::GAME_HEIGHT - 16 - 6*32, true));
+    vPlatform.push_back(new Platform(6, 3, 83*32 - 16, 86*32 + 16, CCFG::GAME_HEIGHT - 16 - 6*32, CCFG::GAME_HEIGHT - 16 - 6*32, 83*32 - 16, (float)CCFG::GAME_HEIGHT - 16 - 6*32, true));
 	
-	vPlatform.push_back(new Platform(6, 3, 91*32 - 16, 93*32 + 16, CCFG::GAME_HEIGHT - 16 - 5*32, CCFG::GAME_HEIGHT - 16 - 5*32, 93*32 + 16, (float)CCFG::GAME_HEIGHT - 16 - 5*32, false));
+    vPlatform.push_back(new Platform(6, 3, 91*32 - 16, 93*32 + 16, CCFG::GAME_HEIGHT - 16 - 5*32, CCFG::GAME_HEIGHT - 16 - 5*32, 93*32 + 16, (float)CCFG::GAME_HEIGHT - 16 - 5*32, false));
 
-	vPlatform.push_back(new Platform(6, 3, 127*32 - 16, 131*32 + 16, CCFG::GAME_HEIGHT - 16 - 8*32, CCFG::GAME_HEIGHT - 16 - 8*32, 127*32 - 16, (float)CCFG::GAME_HEIGHT - 16 - 8*32, false));
+    vPlatform.push_back(new Platform(6, 3, 127*32 - 16, 131*32 + 16, CCFG::GAME_HEIGHT - 16 - 8*32, CCFG::GAME_HEIGHT - 16 - 8*32, 127*32 - 16, (float)CCFG::GAME_HEIGHT - 16 - 8*32, false));
 
 	// ----- CLOUDS
 
@@ -4431,7 +4477,7 @@ void Map::loadLVL_1_4() {
 
 	loadMinionsLVL_1_4();
 
-	vPlatform.push_back(new Platform(4, 3, 136*32 - 16, 138*32 + 16, CCFG::GAME_HEIGHT - 16 - 8*32, CCFG::GAME_HEIGHT - 16 - 8*32, 136*32 - 16, (float)CCFG::GAME_HEIGHT - 16 - 8*32, false));
+    vPlatform.push_back(new Platform(4, 3, 136*32 - 16, 138*32 + 16, CCFG::GAME_HEIGHT - 16 - 8*32, CCFG::GAME_HEIGHT - 16 - 8*32, 136*32 - 16, (float)CCFG::GAME_HEIGHT - 16 - 8*32, false));
 
 	structGND(0, 0, 3, 8);
 	structGND(3, 0, 1, 7);
@@ -4667,7 +4713,7 @@ void Map::loadLVL_2_1() {
 
 	structBonusEnd(332);
 
-	vPlatform.push_back(new Platform(6, 4, 286*32 + 16, 335*32 + 16, CCFG::GAME_HEIGHT - 16 - 4*32, CCFG::GAME_HEIGHT - 16 - 4*32, 286*32.0f + 16, CCFG::GAME_HEIGHT - 16.0f - 4*32, true));
+    vPlatform.push_back(new Platform(6, 4, 286*32 + 16, 335*32 + 16, CCFG::GAME_HEIGHT - 16 - 4*32, CCFG::GAME_HEIGHT - 16 - 4*32, 286*32.0f + 16, CCFG::GAME_HEIGHT - 16.0f - 4*32, true));
 
 	// -- BONUS END
 
@@ -4953,13 +4999,13 @@ void Map::loadLVL_2_4() {
 	// ----- MINIONS
 	loadMinionsLVL_2_4();
 
-	vPlatform.push_back(new Platform(3, 1, 85*32 + 24, 85*32 + 16, -32, CCFG::GAME_HEIGHT + 32, 85*32 + 24, 9*32 + 16, true));
-	vPlatform.push_back(new Platform(3, 1, 85*32 + 24, 85*32 + 16, -32, CCFG::GAME_HEIGHT + 32, 85*32 + 24, 1*32 + 16, true));
+    vPlatform.push_back(new Platform(3, 1, 85*32 + 24, 85*32 + 16, -32, CCFG::GAME_HEIGHT + 32, 85*32 + 24, 9*32 + 16, true));
+    vPlatform.push_back(new Platform(3, 1, 85*32 + 24, 85*32 + 16, -32, CCFG::GAME_HEIGHT + 32, 85*32 + 24, 1*32 + 16, true));
 
-	vPlatform.push_back(new Platform(3, 0, 88*32 + 24, 88*32 + 16, -32, CCFG::GAME_HEIGHT + 32, 88*32 + 24, 10*32, true));
-	vPlatform.push_back(new Platform(3, 0, 88*32 + 24, 88*32 + 16, -32, CCFG::GAME_HEIGHT + 32, 88*32 + 24, 2*32, true));
+    vPlatform.push_back(new Platform(3, 0, 88*32 + 24, 88*32 + 16, -32, CCFG::GAME_HEIGHT + 32, 88*32 + 24, 10*32, true));
+    vPlatform.push_back(new Platform(3, 0, 88*32 + 24, 88*32 + 16, -32, CCFG::GAME_HEIGHT + 32, 88*32 + 24, 2*32, true));
 
-	vPlatform.push_back(new Platform(4, 3, 136*32 - 16, 138*32 + 16, CCFG::GAME_HEIGHT - 16 - 8*32, CCFG::GAME_HEIGHT - 16 - 8*32, 136*32 - 16, (float)CCFG::GAME_HEIGHT - 16 - 8*32, false));
+    vPlatform.push_back(new Platform(4, 3, 136*32 - 16, 138*32 + 16, CCFG::GAME_HEIGHT - 16 - 8*32, CCFG::GAME_HEIGHT - 16 - 8*32, 136*32 - 16, (float)CCFG::GAME_HEIGHT - 16 - 8*32, false));
 
 	structGND(32, 0, 52, 2);
 	structGND(92, 0, 17, 2);
@@ -5243,7 +5289,7 @@ void Map::loadLVL_3_1() {
 
 	structBonusEnd(353);
 
-	vPlatform.push_back(new Platform(6, 4, 286*32 + 16, 355*32 + 16, CCFG::GAME_HEIGHT - 16 - 4*32, CCFG::GAME_HEIGHT - 16 - 4*32, 286*32.0f + 16, CCFG::GAME_HEIGHT - 16.0f - 4*32, true));
+    vPlatform.push_back(new Platform(6, 4, 286*32 + 16, 355*32 + 16, CCFG::GAME_HEIGHT - 16 - 4*32, CCFG::GAME_HEIGHT - 16 - 4*32, 286*32.0f + 16, CCFG::GAME_HEIGHT - 16.0f - 4*32, true));
 
 	// -- END
 
@@ -5464,12 +5510,12 @@ void Map::loadLVL_3_3() {
 	vPlatform.push_back(new Platform(6, 6, 140*32, 140*32, CCFG::GAME_HEIGHT - 16, CCFG::GAME_HEIGHT - 16 - 11*32, 140*32, (float)CCFG::GAME_HEIGHT - 16 - 6*32, true, 2));
 	// -- SEESAW
 
-	vPlatform.push_back(new Platform(6, 3, 27*32 - 16, 30*32 + 16, CCFG::GAME_HEIGHT - 16 - 10*32, CCFG::GAME_HEIGHT - 16 - 10*32, 27*32 - 16, (float)CCFG::GAME_HEIGHT - 16 - 10*32, false));
-	vPlatform.push_back(new Platform(6, 3, 30*32 - 16, 33*32 + 16, CCFG::GAME_HEIGHT - 16 - 6*32, CCFG::GAME_HEIGHT - 16 - 6*32, 33*32 + 16, (float)CCFG::GAME_HEIGHT - 16 - 6*32, true));
+    vPlatform.push_back(new Platform(6, 3, 27*32 - 16, 30*32 + 16, CCFG::GAME_HEIGHT - 16 - 10*32, CCFG::GAME_HEIGHT - 16 - 10*32, 27*32 - 16, (float)CCFG::GAME_HEIGHT - 16 - 10*32, false));
+    vPlatform.push_back(new Platform(6, 3, 30*32 - 16, 33*32 + 16, CCFG::GAME_HEIGHT - 16 - 6*32, CCFG::GAME_HEIGHT - 16 - 6*32, 33*32 + 16, (float)CCFG::GAME_HEIGHT - 16 - 6*32, true));
 	vPlatform.push_back(new Platform(6, 3, 91*32 - 32, 94*32, CCFG::GAME_HEIGHT - 16 - 5*32, CCFG::GAME_HEIGHT - 16 - 5*32, 94*32, (float)CCFG::GAME_HEIGHT - 16 - 5*32, true));
 	vPlatform.push_back(new Platform(6, 3, 92*32, 96*32, CCFG::GAME_HEIGHT - 16 - 9*32, CCFG::GAME_HEIGHT - 16 - 9*32, 92*32, (float)CCFG::GAME_HEIGHT - 16 - 9*32, false));
-	vPlatform.push_back(new Platform(6, 3, 100*32 - 16, 103*32 + 16, CCFG::GAME_HEIGHT - 16 - 3*32, CCFG::GAME_HEIGHT - 16 - 3*32, 103*32 + 16, (float)CCFG::GAME_HEIGHT - 16 - 3*32, true));
-	vPlatform.push_back(new Platform(6, 3, 129*32 - 16, 132*32 + 16, CCFG::GAME_HEIGHT - 16 - 8*32, CCFG::GAME_HEIGHT - 16 - 8*32, 132*32 + 16, (float)CCFG::GAME_HEIGHT - 16 - 8*32, true));
+    vPlatform.push_back(new Platform(6, 3, 100*32 - 16, 103*32 + 16, CCFG::GAME_HEIGHT - 16 - 3*32, CCFG::GAME_HEIGHT - 16 - 3*32, 103*32 + 16, (float)CCFG::GAME_HEIGHT - 16 - 3*32, true));
+    vPlatform.push_back(new Platform(6, 3, 129*32 - 16, 132*32 + 16, CCFG::GAME_HEIGHT - 16 - 8*32, CCFG::GAME_HEIGHT - 16 - 8*32, 132*32 + 16, (float)CCFG::GAME_HEIGHT - 16 - 8*32, true));
 
 	vPlatform.push_back(new Platform(6, 5, 60*32, 60*32, CCFG::GAME_HEIGHT - 16 - 8*32, CCFG::GAME_HEIGHT - 16 - 8*32, 60*32, (float)CCFG::GAME_HEIGHT - 16 - 8*32, true));
 
@@ -5489,7 +5535,7 @@ void Map::loadLVL_3_4() {
 
 	loadMinionsLVL_3_4();
 
-	vPlatform.push_back(new Platform(4, 3, 136*32 - 16, 138*32 + 16, CCFG::GAME_HEIGHT - 16 - 8*32, CCFG::GAME_HEIGHT - 16 - 8*32, 136*32 - 16, (float)CCFG::GAME_HEIGHT - 16 - 8*32, false));
+    vPlatform.push_back(new Platform(4, 3, 136*32 - 16, 138*32 + 16, CCFG::GAME_HEIGHT - 16 - 8*32, CCFG::GAME_HEIGHT - 16 - 8*32, 136*32 - 16, (float)CCFG::GAME_HEIGHT - 16 - 8*32, false));
 
 	structGND(0, 0, 16, 5);
 	structGND(0, 5, 5, 1);
@@ -5790,21 +5836,21 @@ void Map::loadLVL_4_2() {
 	structCoins(27, 2, 3, 1);
 	structCoins(162, 6, 10, 1);
 
-	vPlatform.push_back(new Platform(6, 0, 58*32 + 16, 58*32 + 16, -32, CCFG::GAME_HEIGHT + 32, 58*32 + 16, 9*32 + 16, true));
-	vPlatform.push_back(new Platform(6, 0, 58*32 + 16, 58*32 + 16, -32, CCFG::GAME_HEIGHT + 32, 58*32 + 16, 1*32 + 16, true));
+    vPlatform.push_back(new Platform(6, 0, 58*32 + 16, 58*32 + 16, -32, CCFG::GAME_HEIGHT + 32, 58*32 + 16, 9*32 + 16, true));
+    vPlatform.push_back(new Platform(6, 0, 58*32 + 16, 58*32 + 16, -32, CCFG::GAME_HEIGHT + 32, 58*32 + 16, 1*32 + 16, true));
 
-	vPlatform.push_back(new Platform(6, 0, 114*32 + 16, 114*32 + 16, -32, CCFG::GAME_HEIGHT + 32, 114*32 + 16, 9*32 + 16, true));
-	vPlatform.push_back(new Platform(6, 0, 114*32 + 16, 114*32 + 16, -32, CCFG::GAME_HEIGHT + 32, 114*32 + 16, 1*32 + 16, true));
+    vPlatform.push_back(new Platform(6, 0, 114*32 + 16, 114*32 + 16, -32, CCFG::GAME_HEIGHT + 32, 114*32 + 16, 9*32 + 16, true));
+    vPlatform.push_back(new Platform(6, 0, 114*32 + 16, 114*32 + 16, -32, CCFG::GAME_HEIGHT + 32, 114*32 + 16, 1*32 + 16, true));
 
 	vPlatform.push_back(new Platform(6, 1, 124*32, 124*32, -32, CCFG::GAME_HEIGHT + 32, 124*32, 10*32, true));
 	vPlatform.push_back(new Platform(6, 1, 124*32, 124*32, -32, CCFG::GAME_HEIGHT + 32, 124*32, 2*32, true));
 
-	vPlatform.push_back(new Platform(6, 0, 156*32, 156*32, -32, CCFG::GAME_HEIGHT + 32, 156*32, 9*32 + 16, true));
-	vPlatform.push_back(new Platform(6, 0, 156*32, 156*32, -32, CCFG::GAME_HEIGHT + 32, 156*32, 1*32 + 16, true));
+    vPlatform.push_back(new Platform(6, 0, 156*32, 156*32, -32, CCFG::GAME_HEIGHT + 32, 156*32, 9*32 + 16, true));
+    vPlatform.push_back(new Platform(6, 0, 156*32, 156*32, -32, CCFG::GAME_HEIGHT + 32, 156*32, 1*32 + 16, true));
 
 	vLevelText.push_back(new LevelText(210*32, CCFG::GAME_HEIGHT - 16 - 8*32, "WELCOME TO WARP ZONEz"));
 
-	vLevelText.push_back(new LevelText(214*32 + 16, CCFG::GAME_HEIGHT - 6*32, "5"));
+    vLevelText.push_back(new LevelText(214*32 + 16, CCFG::GAME_HEIGHT - 6*32, "5"));
 
 	// -- MAP 4-2-2
 
@@ -5886,9 +5932,9 @@ void Map::loadLVL_4_2() {
 
 	vLevelText.push_back(new LevelText(360*32, CCFG::GAME_HEIGHT - 16 - 8*32, "WELCOME TO WARP ZONEz"));
 
-	vLevelText.push_back(new LevelText(360*32 + 16, CCFG::GAME_HEIGHT - 6*32, "8"));
-	vLevelText.push_back(new LevelText(364*32 + 16, CCFG::GAME_HEIGHT - 6*32, "7"));
-	vLevelText.push_back(new LevelText(368*32 + 16, CCFG::GAME_HEIGHT - 6*32, "6"));
+    vLevelText.push_back(new LevelText(360*32 + 16, CCFG::GAME_HEIGHT - 6*32, "8"));
+    vLevelText.push_back(new LevelText(364*32 + 16, CCFG::GAME_HEIGHT - 6*32, "7"));
+    vLevelText.push_back(new LevelText(368*32 + 16, CCFG::GAME_HEIGHT - 6*32, "6"));
 
 	for(int i = 0; i < 19; i++) {
 		lMap[374][i]->setBlockID(83);
@@ -6485,8 +6531,8 @@ void Map::loadLVL_5_2() {
 	structCoins(50, 6, 4, 1);
 	structCoins(54, 9, 4, 1);
 
-	vPlatform.push_back(new Platform(6, 2, 22*32, 22*32, CCFG::GAME_HEIGHT - 12*32, CCFG::GAME_HEIGHT - 16 - 3*32, 22*32 + 16, (float)CCFG::GAME_HEIGHT - 16 - 4*32, true));
-	vPlatform.push_back(new Platform(6, 2, 28*32, 28*32, CCFG::GAME_HEIGHT - 12*32, CCFG::GAME_HEIGHT - 16 - 3*32, 28*32 + 16, (float)CCFG::GAME_HEIGHT - 12*32, false));
+    vPlatform.push_back(new Platform(6, 2, 22*32, 22*32, CCFG::GAME_HEIGHT - 12*32, CCFG::GAME_HEIGHT - 16 - 3*32, 22*32 + 16, (float)CCFG::GAME_HEIGHT - 16 - 4*32, true));
+    vPlatform.push_back(new Platform(6, 2, 28*32, 28*32, CCFG::GAME_HEIGHT - 12*32, CCFG::GAME_HEIGHT - 16 - 3*32, 28*32 + 16, (float)CCFG::GAME_HEIGHT - 12*32, false));
 
 	this->iLevelType = 0;
 
@@ -6510,7 +6556,7 @@ void Map::loadLVL_5_2() {
 
 	structBonusEnd(387);
 
-	vPlatform.push_back(new Platform(6, 4, 341*32 + 16, 390*32 + 16, CCFG::GAME_HEIGHT - 16 - 4*32, CCFG::GAME_HEIGHT - 16 - 4*32, 341*32.0f + 16, CCFG::GAME_HEIGHT - 16.0f - 4*32, true));
+    vPlatform.push_back(new Platform(6, 4, 341*32 + 16, 390*32 + 16, CCFG::GAME_HEIGHT - 16 - 4*32, CCFG::GAME_HEIGHT - 16 - 4*32, 341*32.0f + 16, CCFG::GAME_HEIGHT - 16.0f - 4*32, true));
 }
 
 void Map::loadLVL_5_3() {
@@ -6531,11 +6577,11 @@ void Map::loadLVL_5_3() {
 
 	vPlatform.push_back(new Platform(4, 2, 55*32, 55*32, CCFG::GAME_HEIGHT - 16 - 9*32, CCFG::GAME_HEIGHT - 32, 55*32, (float)CCFG::GAME_HEIGHT - 32, true));
 
-	vPlatform.push_back(new Platform(4, 3, 83*32 - 16, 86*32 + 16, CCFG::GAME_HEIGHT - 16 - 6*32, CCFG::GAME_HEIGHT - 16 - 6*32, 83*32 - 16, (float)CCFG::GAME_HEIGHT - 16 - 6*32, true));
+    vPlatform.push_back(new Platform(4, 3, 83*32 - 16, 86*32 + 16, CCFG::GAME_HEIGHT - 16 - 6*32, CCFG::GAME_HEIGHT - 16 - 6*32, 83*32 - 16, (float)CCFG::GAME_HEIGHT - 16 - 6*32, true));
 	
-	vPlatform.push_back(new Platform(4, 3, 91*32 - 16, 93*32 + 16, CCFG::GAME_HEIGHT - 16 - 5*32, CCFG::GAME_HEIGHT - 16 - 5*32, 93*32 + 16, (float)CCFG::GAME_HEIGHT - 16 - 5*32, false));
+    vPlatform.push_back(new Platform(4, 3, 91*32 - 16, 93*32 + 16, CCFG::GAME_HEIGHT - 16 - 5*32, CCFG::GAME_HEIGHT - 16 - 5*32, 93*32 + 16, (float)CCFG::GAME_HEIGHT - 16 - 5*32, false));
 
-	vPlatform.push_back(new Platform(4, 3, 127*32 - 16, 131*32 + 16, CCFG::GAME_HEIGHT - 16 - 8*32, CCFG::GAME_HEIGHT - 16 - 8*32, 127*32 - 16, (float)CCFG::GAME_HEIGHT - 16 - 8*32, false));
+    vPlatform.push_back(new Platform(4, 3, 127*32 - 16, 131*32 + 16, CCFG::GAME_HEIGHT - 16 - 8*32, CCFG::GAME_HEIGHT - 16 - 8*32, 127*32 - 16, (float)CCFG::GAME_HEIGHT - 16 - 8*32, false));
 
 	// ----- CLOUDS
 
@@ -6636,13 +6682,13 @@ void Map::loadLVL_5_4() {
 	// ----- MINIONS
 	loadMinionsLVL_5_4();
 
-	vPlatform.push_back(new Platform(3, 1, 85*32 + 24, 85*32 + 16, -32, CCFG::GAME_HEIGHT + 32, 85*32 + 24, 9*32 + 16, true));
-	vPlatform.push_back(new Platform(3, 1, 85*32 + 24, 85*32 + 16, -32, CCFG::GAME_HEIGHT + 32, 85*32 + 24, 1*32 + 16, true));
+    vPlatform.push_back(new Platform(3, 1, 85*32 + 24, 85*32 + 16, -32, CCFG::GAME_HEIGHT + 32, 85*32 + 24, 9*32 + 16, true));
+    vPlatform.push_back(new Platform(3, 1, 85*32 + 24, 85*32 + 16, -32, CCFG::GAME_HEIGHT + 32, 85*32 + 24, 1*32 + 16, true));
 
-	vPlatform.push_back(new Platform(3, 0, 88*32 + 24, 88*32 + 16, -32, CCFG::GAME_HEIGHT + 32, 88*32 + 24, 10*32, true));
-	vPlatform.push_back(new Platform(3, 0, 88*32 + 24, 88*32 + 16, -32, CCFG::GAME_HEIGHT + 32, 88*32 + 24, 2*32, true));
+    vPlatform.push_back(new Platform(3, 0, 88*32 + 24, 88*32 + 16, -32, CCFG::GAME_HEIGHT + 32, 88*32 + 24, 10*32, true));
+    vPlatform.push_back(new Platform(3, 0, 88*32 + 24, 88*32 + 16, -32, CCFG::GAME_HEIGHT + 32, 88*32 + 24, 2*32, true));
 
-	vPlatform.push_back(new Platform(4, 3, 136*32 - 16, 138*32 + 16, CCFG::GAME_HEIGHT - 16 - 8*32, CCFG::GAME_HEIGHT - 16 - 8*32, 136*32 - 16, (float)CCFG::GAME_HEIGHT - 16 - 8*32, false));
+    vPlatform.push_back(new Platform(4, 3, 136*32 - 16, 138*32 + 16, CCFG::GAME_HEIGHT - 16 - 8*32, CCFG::GAME_HEIGHT - 16 - 8*32, 136*32 - 16, (float)CCFG::GAME_HEIGHT - 16 - 8*32, false));
 
 	structGND(32, 0, 52, 2);
 	structGND(92, 0, 17, 2);
@@ -7012,8 +7058,8 @@ void Map::loadLVL_6_2() {
 	structCoins(50, 6, 4, 1);
 	structCoins(54, 9, 4, 1);
 
-	vPlatform.push_back(new Platform(4, 2, 22*32, 22*32, CCFG::GAME_HEIGHT - 12*32, CCFG::GAME_HEIGHT - 16 - 3*32, 22*32 + 16, (float)CCFG::GAME_HEIGHT - 16 - 4*32, true));
-	vPlatform.push_back(new Platform(4, 2, 28*32, 28*32, CCFG::GAME_HEIGHT - 12*32, CCFG::GAME_HEIGHT - 16 - 3*32, 28*32 + 16, (float)CCFG::GAME_HEIGHT - 12*32, false));
+    vPlatform.push_back(new Platform(4, 2, 22*32, 22*32, CCFG::GAME_HEIGHT - 12*32, CCFG::GAME_HEIGHT - 16 - 3*32, 22*32 + 16, (float)CCFG::GAME_HEIGHT - 16 - 4*32, true));
+    vPlatform.push_back(new Platform(4, 2, 28*32, 28*32, CCFG::GAME_HEIGHT - 12*32, CCFG::GAME_HEIGHT - 16 - 3*32, 28*32 + 16, (float)CCFG::GAME_HEIGHT - 12*32, false));
 
 	// -- MAP 6-2-3
 
@@ -7093,7 +7139,7 @@ void Map::loadLVL_6_2() {
 
 	structBonusEnd(473);
 
-	vPlatform.push_back(new Platform(6, 4, 406*32 + 16, 475*32 + 16, CCFG::GAME_HEIGHT - 16 - 4*32, CCFG::GAME_HEIGHT - 16 - 4*32, 406*32.0f + 16, CCFG::GAME_HEIGHT - 16.0f - 4*32, true));
+    vPlatform.push_back(new Platform(6, 4, 406*32 + 16, 475*32 + 16, CCFG::GAME_HEIGHT - 16 - 4*32, CCFG::GAME_HEIGHT - 16 - 4*32, 406*32.0f + 16, CCFG::GAME_HEIGHT - 16.0f - 4*32, true));
 
 	// -- END
 
@@ -7173,29 +7219,29 @@ void Map::loadLVL_6_3() {
 	// -- SEESAW
 	structSeeSaw(71, 12, 5);
 	
-	vPlatform.push_back(new Platform(4, 6, 70*32 + 16, 70*32 + 16, CCFG::GAME_HEIGHT - 16, CCFG::GAME_HEIGHT - 16 - 11*32, 70*32 + 16, (float)CCFG::GAME_HEIGHT - 16 - 9*32, true, 1));
-	vPlatform.push_back(new Platform(4, 6, 74*32 + 16, 74*32 + 16, CCFG::GAME_HEIGHT - 16, CCFG::GAME_HEIGHT - 16 - 11*32, 74*32 + 16, (float)CCFG::GAME_HEIGHT - 16 - 5*32, true, 0));
+    vPlatform.push_back(new Platform(4, 6, 70*32 + 16, 70*32 + 16, CCFG::GAME_HEIGHT - 16, CCFG::GAME_HEIGHT - 16 - 11*32, 70*32 + 16, (float)CCFG::GAME_HEIGHT - 16 - 9*32, true, 1));
+    vPlatform.push_back(new Platform(4, 6, 74*32 + 16, 74*32 + 16, CCFG::GAME_HEIGHT - 16, CCFG::GAME_HEIGHT - 16 - 11*32, 74*32 + 16, (float)CCFG::GAME_HEIGHT - 16 - 5*32, true, 0));
 
 	structSeeSaw(79, 12, 4);
 	
-	vPlatform.push_back(new Platform(4, 6, 78*32 + 16, 78*32 + 16, CCFG::GAME_HEIGHT - 16, CCFG::GAME_HEIGHT - 16 - 11*32, 78*32 + 16, (float)CCFG::GAME_HEIGHT - 16 - 9*32, true, 3));
-	vPlatform.push_back(new Platform(4, 6, 81*32 + 16, 81*32 + 16, CCFG::GAME_HEIGHT - 16, CCFG::GAME_HEIGHT - 16 - 11*32, 81*32 + 16, (float)CCFG::GAME_HEIGHT - 16 - 5*32, true, 2));
+    vPlatform.push_back(new Platform(4, 6, 78*32 + 16, 78*32 + 16, CCFG::GAME_HEIGHT - 16, CCFG::GAME_HEIGHT - 16 - 11*32, 78*32 + 16, (float)CCFG::GAME_HEIGHT - 16 - 9*32, true, 3));
+    vPlatform.push_back(new Platform(4, 6, 81*32 + 16, 81*32 + 16, CCFG::GAME_HEIGHT - 16, CCFG::GAME_HEIGHT - 16 - 11*32, 81*32 + 16, (float)CCFG::GAME_HEIGHT - 16 - 5*32, true, 2));
 
 	structSeeSaw(127, 12, 4);
 	
-	vPlatform.push_back(new Platform(4, 6, 126*32 + 16, 126*32 + 16, CCFG::GAME_HEIGHT - 16, CCFG::GAME_HEIGHT - 16 - 11*32, 126*32 + 16, (float)CCFG::GAME_HEIGHT - 16 - 9*32, true, 5));
-	vPlatform.push_back(new Platform(4, 6, 129*32 + 16, 129*32 + 16, CCFG::GAME_HEIGHT - 16, CCFG::GAME_HEIGHT - 16 - 11*32, 129*32 + 16, (float)CCFG::GAME_HEIGHT - 16 - 5*32, true, 4));
+    vPlatform.push_back(new Platform(4, 6, 126*32 + 16, 126*32 + 16, CCFG::GAME_HEIGHT - 16, CCFG::GAME_HEIGHT - 16 - 11*32, 126*32 + 16, (float)CCFG::GAME_HEIGHT - 16 - 9*32, true, 5));
+    vPlatform.push_back(new Platform(4, 6, 129*32 + 16, 129*32 + 16, CCFG::GAME_HEIGHT - 16, CCFG::GAME_HEIGHT - 16 - 11*32, 129*32 + 16, (float)CCFG::GAME_HEIGHT - 16 - 5*32, true, 4));
 
 	// -- SEESAW
 
 	vPlatform.push_back(new Platform(4, 2, 28*32, 28*32, CCFG::GAME_HEIGHT - 11*32, CCFG::GAME_HEIGHT - 16 - 2*32, 28*32, (float)CCFG::GAME_HEIGHT - 12*32, false));
 
-	vPlatform.push_back(new Platform(4, 3, 39*32 + 16, 45*32 + 16, CCFG::GAME_HEIGHT - 9*32, CCFG::GAME_HEIGHT - 16 - 9*32, 39*32 + 16, (float)CCFG::GAME_HEIGHT - 9*32, false));
-	vPlatform.push_back(new Platform(4, 3, 45*32 + 16, 49*32 + 16, CCFG::GAME_HEIGHT - 7*32, CCFG::GAME_HEIGHT - 16 - 7*32, 45*32 + 16, (float)CCFG::GAME_HEIGHT - 7*32, true));
-	vPlatform.push_back(new Platform(4, 3, 51*32, 56*32, CCFG::GAME_HEIGHT - 8*32, CCFG::GAME_HEIGHT - 16 - 8*32, 51*32 + 16, (float)CCFG::GAME_HEIGHT - 8*32, false));
+    vPlatform.push_back(new Platform(4, 3, 39*32 + 16, 45*32 + 16, CCFG::GAME_HEIGHT - 9*32, CCFG::GAME_HEIGHT - 16 - 9*32, 39*32 + 16, (float)CCFG::GAME_HEIGHT - 9*32, false));
+    vPlatform.push_back(new Platform(4, 3, 45*32 + 16, 49*32 + 16, CCFG::GAME_HEIGHT - 7*32, CCFG::GAME_HEIGHT - 16 - 7*32, 45*32 + 16, (float)CCFG::GAME_HEIGHT - 7*32, true));
+    vPlatform.push_back(new Platform(4, 3, 51*32, 56*32, CCFG::GAME_HEIGHT - 8*32, CCFG::GAME_HEIGHT - 16 - 8*32, 51*32 + 16, (float)CCFG::GAME_HEIGHT - 8*32, false));
 	
 	vPlatform.push_back(new Platform(4, 2, 60*32, 60*32, CCFG::GAME_HEIGHT - 11*32, CCFG::GAME_HEIGHT - 16 - 2*32, 60*32, (float)CCFG::GAME_HEIGHT - 12*32, false));
-	vPlatform.push_back(new Platform(4, 2, 121*32 + 16, 121*32 + 16, CCFG::GAME_HEIGHT - 11*32, CCFG::GAME_HEIGHT - 16 - 2*32, 121*32 + 16, (float)CCFG::GAME_HEIGHT - 12*32, false));
+    vPlatform.push_back(new Platform(4, 2, 121*32 + 16, 121*32 + 16, CCFG::GAME_HEIGHT - 11*32, CCFG::GAME_HEIGHT - 16 - 2*32, 121*32 + 16, (float)CCFG::GAME_HEIGHT - 12*32, false));
 
 	vPlatform.push_back(new Platform(4, 5, 141*32, 141*32, CCFG::GAME_HEIGHT - 16 - 7*32, CCFG::GAME_HEIGHT - 16 - 7*32, 141*32, (float)CCFG::GAME_HEIGHT - 16 - 7*32, true));
 	vPlatform.push_back(new Platform(4, 5, 145*32, 145*32, CCFG::GAME_HEIGHT - 16 - 8*32, CCFG::GAME_HEIGHT - 16 - 8*32, 145*32, (float)CCFG::GAME_HEIGHT - 16 - 8*32, true));
@@ -7243,7 +7289,7 @@ void Map::loadLVL_6_4() {
 
 	loadMinionsLVL_6_4();
 
-	vPlatform.push_back(new Platform(4, 3, 136*32 - 16, 138*32 + 16, CCFG::GAME_HEIGHT - 16 - 8*32, CCFG::GAME_HEIGHT - 16 - 8*32, 136*32 - 16, (float)CCFG::GAME_HEIGHT - 16 - 8*32, false));
+    vPlatform.push_back(new Platform(4, 3, 136*32 - 16, 138*32 + 16, CCFG::GAME_HEIGHT - 16 - 8*32, CCFG::GAME_HEIGHT - 16 - 8*32, 136*32 - 16, (float)CCFG::GAME_HEIGHT - 16 - 8*32, false));
 
 	structGND(0, 0, 3, 8);
 	structGND(3, 0, 1, 7);
@@ -8445,7 +8491,7 @@ void Map::loadLVL_8_4() {
 	structGND(163, 5, 2, 1);
 	structPipe(163, 6, 2);
 
-	vPlatform.push_back(new Platform(4, 3, 68*32 - 16, 71*32 + 16, CCFG::GAME_HEIGHT - 16 - 32, CCFG::GAME_HEIGHT - 16 - 32, 68*32 - 16, (float)CCFG::GAME_HEIGHT - 16 - 30, true));
+    vPlatform.push_back(new Platform(4, 3, 68*32 - 16, 71*32 + 16, CCFG::GAME_HEIGHT - 16 - 32, CCFG::GAME_HEIGHT - 16 - 32, 68*32 - 16, (float)CCFG::GAME_HEIGHT - 16 - 30, true));
 
 	for(int i = 0; i < 10; i++) {
 		lMap[110][2 + i]->setBlockID(169);
@@ -8522,16 +8568,16 @@ bool Map::blockUse(int nX, int nY, int iBlockID, int POS) {
 				if(lMap[nX][nY]->getSpawnMushroom()) {
 					if(lMap[nX][nY]->getPowerUP()) {
 						if(oPlayer->getPowerLVL() == 0) {
-							lMinion[getListID(32 * nX)].push_back(new Mushroom(32 * nX, CCFG::GAME_HEIGHT - 16 - 32 * nY, true, nX, nY));
+                            lMinion[getListID(32 * nX)].push_back(new Mushroom(32 * nX * CCFG::GAME_SIZE, CCFG::GAME_HEIGHT - 16 - 32 * nY * CCFG::GAME_SIZE, true, nX, nY));
 						} else {
-							lMinion[getListID(32 * nX)].push_back(new Flower(32 * nX, CCFG::GAME_HEIGHT - 16 - 32 * nY, nX, nY));
+                            lMinion[getListID(32 * nX)].push_back(new Flower(32 * nX * CCFG::GAME_SIZE, CCFG::GAME_HEIGHT - 16 - 32 * nY * CCFG::GAME_SIZE, nX, nY));
 						}
 					} else {
-						lMinion[getListID(32 * nX)].push_back(new Mushroom(32 * nX, CCFG::GAME_HEIGHT - 16 - 32 * nY, false, nX, nY));
+                        lMinion[getListID(32 * nX)].push_back(new Mushroom(32 * nX * CCFG::GAME_SIZE, CCFG::GAME_HEIGHT - 16 - 32 * nY * CCFG::GAME_SIZE, false, nX, nY));
 					}
 					CCFG::getMusic()->PlayChunk(CCFG::getMusic()->cMUSHROOMAPPER);
 				} else {
-					lCoin.push_back(new Coin(nX * 32 + 7, CCFG::GAME_HEIGHT - nY * 32 - 48));
+                    lCoin.push_back(new Coin(nX * 32 * CCFG::GAME_SIZE + 7, CCFG::GAME_HEIGHT - nY * 32 * CCFG::GAME_SIZE - 48));
 					oPlayer->setScore(oPlayer->getScore() + 200);
 					CCFG::getMusic()->PlayChunk(CCFG::getMusic()->cCOIN);
 					oPlayer->setCoins(oPlayer->getCoins() + 1);
@@ -8550,24 +8596,24 @@ bool Map::blockUse(int nX, int nY, int iBlockID, int POS) {
 			case 13: case 28: case 81: // ----- Brick
 				if(lMap[nX][nY]->getSpawnStar()) {
 					lMap[nX][nY]->setBlockID(iLevelType == 0 || iLevelType == 4 ? 9 : iLevelType == 1 ? 56 : 80);
-					lMinion[getListID(32 * nX)].push_back(new Star(32 * nX, CCFG::GAME_HEIGHT - 16 - 32 * nY, nX, nY));
+                    lMinion[getListID(32 * nX)].push_back(new Star(32 * nX, CCFG::GAME_HEIGHT - 16 - 32 * nY * CCFG::GAME_SIZE, nX, nY));
 					lMap[nX][nY]->startBlockAnimation();
 					CCFG::getMusic()->PlayChunk(CCFG::getMusic()->cMUSHROOMAPPER);
 				} else if(lMap[nX][nY]->getSpawnMushroom()) {
 					lMap[nX][nY]->setBlockID(iLevelType == 0 || iLevelType == 4 ? 9 : iLevelType == 1 ? 56 : 80);
 					if(lMap[nX][nY]->getPowerUP()) {
 						if(oPlayer->getPowerLVL() == 0) {
-							lMinion[getListID(32 * nX)].push_back(new Mushroom(32 * nX, CCFG::GAME_HEIGHT - 16 - 32 * nY, true, nX, nY));
+                            lMinion[getListID(32 * nX)].push_back(new Mushroom(32 * nX * CCFG::GAME_SIZE, CCFG::GAME_HEIGHT - 16 - 32 * nY * CCFG::GAME_SIZE, true, nX, nY));
 						} else {
-							lMinion[getListID(32 * nX)].push_back(new Flower(32 * nX, CCFG::GAME_HEIGHT - 16 - 32 * nY, nX, nY));
+                            lMinion[getListID(32 * nX)].push_back(new Flower(32 * nX * CCFG::GAME_SIZE, CCFG::GAME_HEIGHT - 16 - 32 * nY * CCFG::GAME_SIZE, nX, nY));
 						}
 					} else {
-						lMinion[getListID(32 * nX)].push_back(new Mushroom(32 * nX, CCFG::GAME_HEIGHT - 16 - 32 * nY, false, nX, nY));
+                        lMinion[getListID(32 * nX)].push_back(new Mushroom(32 * nX * CCFG::GAME_SIZE, CCFG::GAME_HEIGHT - 16 - 32 * nY, false, nX, nY));
 					}
 					lMap[nX][nY]->startBlockAnimation();
 					CCFG::getMusic()->PlayChunk(CCFG::getMusic()->cMUSHROOMAPPER);
 				} else if(lMap[nX][nY]->getNumOfUse() > 0) {
-					lCoin.push_back(new Coin(nX * 32 + 7, CCFG::GAME_HEIGHT - nY * 32 - 48));
+                    lCoin.push_back(new Coin(nX * 32 * CCFG::GAME_SIZE + 7, CCFG::GAME_HEIGHT - nY * 32 * CCFG::GAME_SIZE - 48));
 					oPlayer->setScore(oPlayer->getScore() + 200);
 					oPlayer->setCoins(oPlayer->getCoins() + 1);
 
@@ -8582,7 +8628,7 @@ bool Map::blockUse(int nX, int nY, int iBlockID, int POS) {
 				} else {
 					if(oPlayer->getPowerLVL() > 0) {
 						lMap[nX][nY]->setBlockID(0);
-						lBlockDebris.push_back(new BlockDebris(nX * 32, CCFG::GAME_HEIGHT - 48 - nY * 32));
+                        lBlockDebris.push_back(new BlockDebris(nX * 32 * CCFG::GAME_SIZE, CCFG::GAME_HEIGHT - 48 - nY * 32 * CCFG::GAME_SIZE));
 						CCFG::getMusic()->PlayChunk(CCFG::getMusic()->cBLOCKBREAK);
 					} else {
 						lMap[nX][nY]->startBlockAnimation();
@@ -8596,16 +8642,16 @@ bool Map::blockUse(int nX, int nY, int iBlockID, int POS) {
 				if(lMap[nX][nY]->getSpawnMushroom()) {
 					if(lMap[nX][nY]->getPowerUP()) {
 						if(oPlayer->getPowerLVL() == 0) {
-							lMinion[getListID(32 * nX)].push_back(new Mushroom(32 * nX, CCFG::GAME_HEIGHT - 16 - 32 * nY, true, nX, nY));
+                            lMinion[getListID(32 * nX)].push_back(new Mushroom(32 * nX * CCFG::GAME_SIZE, CCFG::GAME_HEIGHT - 16 - 32 * nY * CCFG::GAME_SIZE, true, nX, nY));
 						} else {
-							lMinion[getListID(32 * nX)].push_back(new Flower(32 * nX, CCFG::GAME_HEIGHT - 16 - 32 * nY, nX, nY));
+                            lMinion[getListID(32 * nX)].push_back(new Flower(32 * nX * CCFG::GAME_SIZE, CCFG::GAME_HEIGHT - 16 - 32 * nY * CCFG::GAME_SIZE, nX, nY));
 						}
 					} else {
-						lMinion[getListID(32 * nX)].push_back(new Mushroom(32 * nX, CCFG::GAME_HEIGHT - 16 - 32 * nY, false, nX, nY));
+                        lMinion[getListID(32 * nX)].push_back(new Mushroom(32 * nX * CCFG::GAME_SIZE, CCFG::GAME_HEIGHT - 16 - 32 * nY * CCFG::GAME_SIZE, false, nX, nY));
 					}
 					CCFG::getMusic()->PlayChunk(CCFG::getMusic()->cMUSHROOMAPPER);
 				} else {
-					lCoin.push_back(new Coin(nX * 32 + 7, CCFG::GAME_HEIGHT - nY * 32 - 48));
+                    lCoin.push_back(new Coin(nX * 32 * CCFG::GAME_SIZE + 7, CCFG::GAME_HEIGHT - nY * 32 * CCFG::GAME_SIZE - 48));
 					oPlayer->setCoins(oPlayer->getCoins() + 1);
 					oPlayer->setScore(oPlayer->getScore() + 200);
 					CCFG::getMusic()->PlayChunk(CCFG::getMusic()->cCOIN);
@@ -9467,7 +9513,7 @@ void Map::EndBoss() {
 	}
 
 	oEvent->vOLDDir.push_back(oEvent->eRIGHT);
-	oEvent->vOLDLength.push_back(2*32 + 16);
+    oEvent->vOLDLength.push_back(2*32 + 16);
 
 	oEvent->vOLDDir.push_back(oEvent->eMARIOSPRITE1);
 	oEvent->vOLDLength.push_back(1);
@@ -9518,26 +9564,26 @@ void Map::EndBonus() {
 
 	switch(currentLevelID) {
 		case 4: {
-			oEvent->newMapXPos = -158*32 + 16;
+            oEvent->newMapXPos = -158*32 + 16;
 			oEvent->newPlayerXPos = 128;
 			oEvent->newPlayerYPos = -oPlayer->getHitBoxY();
 			
 			break;
 		}
 		case 8: {
-			oEvent->newMapXPos = -158*32 + 16;
+            oEvent->newMapXPos = -158*32 + 16;
 			oEvent->newPlayerXPos = 128;
 			oEvent->newPlayerYPos = -oPlayer->getHitBoxY();
 			break;
 		}
 		case 17: {
-			oEvent->newMapXPos = -207*32 + 16;
+            oEvent->newMapXPos = -207*32 + 16;
 			oEvent->newPlayerXPos = 128;
 			oEvent->newPlayerYPos = -oPlayer->getHitBoxY();
 			break;
 		}
 		case 21: {
-			oEvent->newMapXPos = -243*32 + 16;
+            oEvent->newMapXPos = -243*32 + 16;
 			oEvent->newPlayerXPos = 128;
 			oEvent->newPlayerYPos = -oPlayer->getHitBoxY();
 			break;
@@ -9847,74 +9893,74 @@ void Map::TPUse3() {
 void Map::structBush(int X, int Y, int iSize) {
 	// ----- LEFT & RIGHT
 	for(int i = 0; i < iSize; i++) {
-		lMap[X + i][Y + i]->setBlockID(5);
-		lMap[X + iSize + 1 + i][Y + iSize - 1 - i]->setBlockID(6);
+        lMap[X + i][Y + i]->setBlockID(5);
+        lMap[X + iSize + 1 + i][Y + iSize - 1 - i]->setBlockID(6);
 	}
 	
 	// ----- CENTER LEFT & RIGHT
 	for(int i = 0, k = 1; i < iSize - 1; i++) {
 		for(int j = 0; j < k; j++) {
-			lMap[X + 1 + i][Y + j]->setBlockID((i%2 == 0 ? 3 : 4));
-			lMap[X + iSize * 2 - 1 - i][Y + j]->setBlockID((i%2 == 0 ? 3 : 4));
+            lMap[X + 1 + i][Y + j]->setBlockID((i%2 == 0 ? 3 : 4));
+            lMap[X + iSize * 2 - 1 - i][Y + j]->setBlockID((i%2 == 0 ? 3 : 4));
 		}
 		++k;
 	}
 
 	// ----- CENTER
 	for(int i = 0; i < iSize; i++) {
-		lMap[X + iSize][Y + i]->setBlockID((i%2 == 0 && iSize != 1 ? 4 : 3));
+        lMap[X + iSize][Y + i]->setBlockID((i%2 == 0 && iSize != 1 ? 4 : 3));
 	}
 
 	// ----- TOP
-	lMap[X + iSize][Y + iSize]->setBlockID(7);
+    lMap[X + iSize][Y + iSize]->setBlockID(7);
 }
 
 void Map::structGrass(int X, int Y, int iSize) {
-	lMap[X][Y]->setBlockID(10);
+    lMap[X][Y]->setBlockID(10);
 	for(int i = 0; i < iSize; i++) {
-		lMap[X + 1 + i][Y]->setBlockID(11);
+        lMap[X + 1 + i][Y]->setBlockID(11);
 	}
-	lMap[X + iSize + 1][Y]->setBlockID(12);
+    lMap[X + iSize + 1][Y]->setBlockID(12);
 }
 
 void Map::structCloud(int X, int Y, int iSize) {
 	// ----- LEFT
-	lMap[X][Y]->setBlockID(iLevelType == 3 ? 148 : 14);
-	lMap[X][Y + 1]->setBlockID(15);
+    lMap[X][Y]->setBlockID(iLevelType == 3 ? 148 : 14);
+    lMap[X][Y + 1]->setBlockID(15);
 	
 	for(int i = 0; i < iSize; i++) {
-		lMap[X + 1 + i][Y]->setBlockID(iLevelType == 3 ? 149 : 16);
-		lMap[X + 1 + i][Y + 1]->setBlockID(iLevelType == 3 ? 150 : 17);
+        lMap[X + 1 + i][Y]->setBlockID(iLevelType == 3 ? 149 : 16);
+        lMap[X + 1 + i][Y + 1]->setBlockID(iLevelType == 3 ? 150 : 17);
 	}
 
-	lMap[X + iSize + 1][Y]->setBlockID(18);
-	lMap[X + iSize + 1][Y + 1]->setBlockID(19);
+    lMap[X + iSize + 1][Y]->setBlockID(18);
+    lMap[X + iSize + 1][Y + 1]->setBlockID(19);
 }
 
 void Map::structGND(int X, int Y, int iWidth, int iHeight) {
 	for(int i = 0; i < iWidth; i++) {
 		for(int j = 0; j < iHeight; j++) {
-			lMap[X + i][Y + j]->setBlockID(iLevelType == 0 || iLevelType == 4 ? 1 : iLevelType == 1 ? 26 : iLevelType == 2 ? 92 : iLevelType == 6 ? 166 : iLevelType == 7 ? 181 : 75);
+            lMap[X + i][Y + j]->setBlockID(iLevelType == 0 || iLevelType == 4 ? 1 : iLevelType == 1 ? 26 : iLevelType == 2 ? 92 : iLevelType == 6 ? 166 : iLevelType == 7 ? 181 : 75);
 		}
 	}
 }
 
 void Map::structBonus(int X, int Y, int iWidth) {
 	for(int i = 0; i < iWidth; i++) {
-		lMap[X + i][Y]->setBlockID(125);
+        lMap[X + i][Y]->setBlockID(125);
 	}
 }
 
 void Map::structBonusEnd(int X) {
 	for(int i = 0; i < 20; i++) {
-		lMap[X + i][0]->setBlockID(127);
+        lMap[X + i][0]->setBlockID(127);
 	}
 }
 
 void Map::structUW1(int X, int Y, int iWidth, int iHeight) {
 	for(int i = 0; i < iWidth; i++) {
 		for(int j = 0; j < iHeight; j++) {
-			lMap[X + i][Y + j]->setBlockID(93);
+            lMap[X + i][Y + j]->setBlockID(93);
 		}
 	}
 }
@@ -9924,14 +9970,14 @@ void Map::structGND2(int X, int Y, int iSize, bool bDir) {
 	if(bDir) {
 		for(int i = 0, k = 1; i < iSize; i++) {
 			for(int j = 0; j < k; j++) {
-				lMap[X + i][Y + j]->setBlockID(iLevelType == 0 || iLevelType == 4 ? 25 : iLevelType == 3 ? 167 : 27);
+                lMap[X + i][Y + j]->setBlockID(iLevelType == 0 || iLevelType == 4 ? 25 : iLevelType == 3 ? 167 : 27);
 			}
 			++k;
 		}
 	} else {
 		for(int i = 0, k = 1; i < iSize; i++) {
 			for(int j = 0; j < k; j++) {
-				lMap[X + iSize - 1 - i][Y + j]->setBlockID(iLevelType == 0 || iLevelType == 4 ? 25 : iLevelType == 3 ? 167 : 27);
+                lMap[X + iSize - 1 - i][Y + j]->setBlockID(iLevelType == 0 || iLevelType == 4 ? 25 : iLevelType == 3 ? 167 : 27);
 			}
 			++k;
 		}
@@ -9941,273 +9987,273 @@ void Map::structGND2(int X, int Y, int iSize, bool bDir) {
 void Map::structGND2(int X, int Y, int iWidth, int iHeight) {
 	for(int i = 0; i < iWidth; i++) {
 		for(int j = 0; j < iHeight; j++) {
-			lMap[X + i][Y + j]->setBlockID(iLevelType == 0 || iLevelType == 4 ? 25 : iLevelType == 3 ? 167 : 27);
+            lMap[X + i][Y + j]->setBlockID(iLevelType == 0 || iLevelType == 4 ? 25 : iLevelType == 3 ? 167 : 27);
 		}
 	}
 }
 
 void Map::structPipe(int X, int Y, int iHeight) {
 	for(int i = 0; i < iHeight; i++) {
-		lMap[X][Y + i]->setBlockID(iLevelType == 0 ? 20 : iLevelType == 2 ? 97 : iLevelType == 4 ? 112 : iLevelType == 5 ? 136 : iLevelType == 3 ? 176 : iLevelType == 7 ? 172 : 30);
-		lMap[X + 1][Y + i]->setBlockID(iLevelType == 0 ? 22 : iLevelType == 2 ? 99 : iLevelType == 4 ? 114 : iLevelType == 5 ? 138 : iLevelType == 3 ? 178 : iLevelType == 7 ? 174 : 32);
+        lMap[X][Y + i]->setBlockID(iLevelType == 0 ? 20 : iLevelType == 2 ? 97 : iLevelType == 4 ? 112 : iLevelType == 5 ? 136 : iLevelType == 3 ? 176 : iLevelType == 7 ? 172 : 30);
+        lMap[X + 1][Y + i]->setBlockID(iLevelType == 0 ? 22 : iLevelType == 2 ? 99 : iLevelType == 4 ? 114 : iLevelType == 5 ? 138 : iLevelType == 3 ? 178 : iLevelType == 7 ? 174 : 32);
 	}
 
-	lMap[X][Y + iHeight]->setBlockID(iLevelType == 0 ? 21 : iLevelType == 2 ? 98 : iLevelType == 4 ? 113 : iLevelType == 5 ? 137 : iLevelType == 3 ? 177 : iLevelType == 7 ? 173 : 31);
-	lMap[X + 1][Y + iHeight]->setBlockID(iLevelType == 0 ? 23 : iLevelType == 2 ? 100 : iLevelType == 4 ? 115 : iLevelType == 5 ? 139 : iLevelType == 3 ? 179 : iLevelType == 7 ? 175 : 33);
+    lMap[X][Y + iHeight]->setBlockID(iLevelType == 0 ? 21 : iLevelType == 2 ? 98 : iLevelType == 4 ? 113 : iLevelType == 5 ? 137 : iLevelType == 3 ? 177 : iLevelType == 7 ? 173 : 31);
+    lMap[X + 1][Y + iHeight]->setBlockID(iLevelType == 0 ? 23 : iLevelType == 2 ? 100 : iLevelType == 4 ? 115 : iLevelType == 5 ? 139 : iLevelType == 3 ? 179 : iLevelType == 7 ? 175 : 33);
 }
 
 void Map::structPipeVertical(int X, int Y, int iHeight) {
 	for(int i = 0; i < iHeight + 1; i++) {
-		lMap[X][Y + i]->setBlockID(iLevelType == 0 ? 20 : iLevelType == 2 ? 97 : iLevelType == 4 ? 112 : 30);
-		lMap[X + 1][Y + i]->setBlockID(iLevelType == 0 ? 22 : iLevelType == 2 ? 99 : iLevelType == 4 ? 114 : 32);
+        lMap[X][Y + i]->setBlockID(iLevelType == 0 ? 20 : iLevelType == 2 ? 97 : iLevelType == 4 ? 112 : 30);
+        lMap[X + 1][Y + i]->setBlockID(iLevelType == 0 ? 22 : iLevelType == 2 ? 99 : iLevelType == 4 ? 114 : 32);
 	}
 }
 
 void Map::structPipeHorizontal(int X, int Y, int iWidth) {
-	lMap[X][Y]->setBlockID(iLevelType == 0 ? 62 : iLevelType == 2 ? 105 : iLevelType == 4 ? 120 : 38);
-	lMap[X][Y + 1]->setBlockID(iLevelType == 0 ? 60 : iLevelType == 2 ? 103 : iLevelType == 4 ? 118 : 36);
+    lMap[X][Y]->setBlockID(iLevelType == 0 ? 62 : iLevelType == 2 ? 105 : iLevelType == 4 ? 120 : 38);
+    lMap[X][Y + 1]->setBlockID(iLevelType == 0 ? 60 : iLevelType == 2 ? 103 : iLevelType == 4 ? 118 : 36);
 
 	for(int i = 0 ; i < iWidth; i++) {
-		lMap[X + 1 + i][Y]->setBlockID(iLevelType == 0 ? 61 : iLevelType == 2 ? 104 : iLevelType == 4 ? 119 : 37);
-		lMap[X + 1 + i][Y + 1]->setBlockID(iLevelType == 0 ? 59 : iLevelType == 2 ? 102 : iLevelType == 4 ? 117 : 35);
+        lMap[X + 1 + i][Y]->setBlockID(iLevelType == 0 ? 61 : iLevelType == 2 ? 104 : iLevelType == 4 ? 119 : 37);
+        lMap[X + 1 + i][Y + 1]->setBlockID(iLevelType == 0 ? 59 : iLevelType == 2 ? 102 : iLevelType == 4 ? 117 : 35);
 	}
 	
-	lMap[X + 1 + iWidth][Y]->setBlockID(iLevelType == 0 ? 58 : iLevelType == 2 ? 101 : iLevelType == 4 ? 116 : 34);
-	lMap[X + 1 + iWidth][Y + 1]->setBlockID(iLevelType == 0 ? 63 : iLevelType == 2 ? 106 : iLevelType == 4 ? 121 : 39);
+    lMap[X + 1 + iWidth][Y]->setBlockID(iLevelType == 0 ? 58 : iLevelType == 2 ? 101 : iLevelType == 4 ? 116 : 34);
+    lMap[X + 1 + iWidth][Y + 1]->setBlockID(iLevelType == 0 ? 63 : iLevelType == 2 ? 106 : iLevelType == 4 ? 121 : 39);
 }
 
 void Map::structBrick(int X, int Y, int iWidth, int iHeight) {
 	for(int i = 0; i < iWidth; i++) {
 		for(int j = 0; j < iHeight; j++) {
-			lMap[X + i][Y + j]->setBlockID(iLevelType == 0 || iLevelType == 4 ? 13 : iLevelType == 3 ? 81 : 28);
+            lMap[X + i][Y + j]->setBlockID(iLevelType == 0 || iLevelType == 4 ? 13 : iLevelType == 3 ? 81 : 28);
 		}
 	}
 }
 
 void Map::struckBlockQ(int X, int Y, int iWidth) {
 	for(int i = 0; i < iWidth; i++) {
-		lMap[X + i][Y]->setBlockID(iLevelType == 0 || iLevelType == 4 ? 8 : 55);
+        lMap[X + i][Y]->setBlockID(iLevelType == 0 || iLevelType == 4 ? 8 : 55);
 	}
 }
 
 void Map::struckBlockQ2(int X, int Y, int iWidth) {
 	for(int i = 0; i < iWidth; i++) {
-		lMap[X + i][Y]->setBlockID(24);
+        lMap[X + i][Y]->setBlockID(24);
 	}
 }
 
 void Map::structCoins(int X, int Y, int iWidth, int iHeight) {
 	for(int i = 0; i < iWidth; i++) {
 		for(int j = 0; j < iHeight; j++) {
-			lMap[X + i][Y + j]->setBlockID(iLevelType == 0 || iLevelType == 4 ? 71 : iLevelType == 1 ? 29 : iLevelType == 2 ? 73 : 29);
+            lMap[X + i][Y + j]->setBlockID(iLevelType == 0 || iLevelType == 4 ? 71 : iLevelType == 1 ? 29 : iLevelType == 2 ? 73 : 29);
 		}
 	}
 }
 
 void Map::structEnd(int X, int Y, int iHeight) {
 	for(int i = 0; i < iHeight; i++) {
-		lMap[X][Y + i]->setBlockID(iLevelType == 4 ? 123 : 40);
+        lMap[X][Y + i]->setBlockID(iLevelType == 4 ? 123 : 40);
 	}
 
-	oFlag = new Flag(X*32 - 16, Y + iHeight + 72);
+    oFlag = new Flag(X*32 - 16, Y + iHeight + 72);
 
-	lMap[X][Y + iHeight]->setBlockID(iLevelType == 4 ? 124 : 41);
+    lMap[X][Y + iHeight]->setBlockID(iLevelType == 4 ? 124 : 41);
 
-	for(int i = Y + iHeight + 1; i < Y + iHeight + 4; i++) {
+    for(int i = Y + iHeight + 1; i < Y + iHeight + 4; i++) {
 		lMap[X][i]->setBlockID(182);
 	}
 }
 
 void Map::structCastleSmall(int X, int Y) {
 	for(int i = 0; i < 2; i++){
-		lMap[X][Y + i]->setBlockID(iLevelType == 3 ? 155 : 43);
-		lMap[X + 1][Y + i]->setBlockID(iLevelType == 3 ? 155 : 43);
-		lMap[X + 3][Y + i]->setBlockID(iLevelType == 3 ? 155 : 43);
-		lMap[X + 4][Y + i]->setBlockID(iLevelType == 3 ? 155 : 43);
+        lMap[X][Y + i]->setBlockID(iLevelType == 3 ? 155 : 43);
+        lMap[X + 1][Y + i]->setBlockID(iLevelType == 3 ? 155 : 43);
+        lMap[X + 3][Y + i]->setBlockID(iLevelType == 3 ? 155 : 43);
+        lMap[X + 4][Y + i]->setBlockID(iLevelType == 3 ? 155 : 43);
 
-		lMap[X + 2][Y + i]->setBlockID(iLevelType == 3 ? 159 : 47);
+        lMap[X + 2][Y + i]->setBlockID(iLevelType == 3 ? 159 : 47);
 	}
 
-	lMap[X + 2][Y + 1]->setBlockID(iLevelType == 3 ? 158 : 46);
+    lMap[X + 2][Y + 1]->setBlockID(iLevelType == 3 ? 158 : 46);
 
 	for(int i = 0; i < 5; i++) {
-		lMap[X + i][Y + 2]->setBlockID(i == 0 || i == 4 ? iLevelType == 3 ? 157 : 45 : iLevelType == 3 ? 156 : 44);
+        lMap[X + i][Y + 2]->setBlockID(i == 0 || i == 4 ? iLevelType == 3 ? 157 : 45 : iLevelType == 3 ? 156 : 44);
 	}
 
-	lMap[X + 1][Y + 3]->setBlockID(iLevelType == 3 ? 160 : 48);
-	lMap[X + 2][Y + 3]->setBlockID(iLevelType == 3 ? 155 : 43);
-	lMap[X + 3][Y + 3]->setBlockID(iLevelType == 3 ? 161 : 49);
+    lMap[X + 1][Y + 3]->setBlockID(iLevelType == 3 ? 160 : 48);
+    lMap[X + 2][Y + 3]->setBlockID(iLevelType == 3 ? 155 : 43);
+    lMap[X + 3][Y + 3]->setBlockID(iLevelType == 3 ? 161 : 49);
 
 	for(int i = 0; i < 3; i++) {
-		lMap[X + i + 1][Y + 4]->setBlockID(iLevelType == 3 ? 157 : 45);
+        lMap[X + i + 1][Y + 4]->setBlockID(iLevelType == 3 ? 157 : 45);
 	}
 }
 
 void Map::structCastleBig(int X, int Y) {
 	for(int i = 0; i < 2; i++) {
 		for(int j = 0; j < 5; j++) {
-			setBlockID(X + i, Y + j, iLevelType == 3 ? 155 : 43);
-			setBlockID(X + i + 7, Y + j, iLevelType == 3 ? 155 : 43);
+            setBlockID(X + i, Y + j, iLevelType == 3 ? 155 : 43);
+            setBlockID(X + i + 7, Y + j, iLevelType == 3 ? 155 : 43);
 		}
 	}
 
 	for(int i = 0; i < 3; i++) {
-		setBlockID(X + 2 + i*2, Y, iLevelType == 3 ? 159 : 47);
-		setBlockID(X + 2 + i*2, Y + 1, iLevelType == 3 ? 158 : 46);
+        setBlockID(X + 2 + i*2, Y, iLevelType == 3 ? 159 : 47);
+        setBlockID(X + 2 + i*2, Y + 1, iLevelType == 3 ? 158 : 46);
 	}
 
 	for(int i = 0; i < 9; i++) {
-		setBlockID(X + i, Y + 2, iLevelType == 3 ? 155 : 43);
+        setBlockID(X + i, Y + 2, iLevelType == 3 ? 155 : 43);
 	}
 
 	for(int i = 0; i < 9; i++) {
 		if(i < 2 || i > 6) {
-			setBlockID(X + i, Y + 5, iLevelType == 3 ? 157 : 45);
+            setBlockID(X + i, Y + 5, iLevelType == 3 ? 157 : 45);
 		} else {
-			setBlockID(X + i, Y + 5, iLevelType == 3 ? 156 : 44);
+            setBlockID(X + i, Y + 5, iLevelType == 3 ? 156 : 44);
 		}
 	}
 
 	
 	for(int i = 0; i < 2; i++) {
-		setBlockID(X + 3 + i*2, Y, iLevelType == 3 ? 155 : 43);
-		setBlockID(X + 3 + i*2, Y + 1, iLevelType == 3 ? 155 : 43);
+        setBlockID(X + 3 + i*2, Y, iLevelType == 3 ? 155 : 43);
+        setBlockID(X + 3 + i*2, Y + 1, iLevelType == 3 ? 155 : 43);
 	}
 	
 	for(int i = 0; i < 2; i++) {
-		setBlockID(X + 3 + i*2, Y + 3, iLevelType == 3 ? 159 : 47);
-		setBlockID(X + 3 + i*2, Y + 4, iLevelType == 3 ? 158 : 46);
+        setBlockID(X + 3 + i*2, Y + 3, iLevelType == 3 ? 159 : 47);
+        setBlockID(X + 3 + i*2, Y + 4, iLevelType == 3 ? 158 : 46);
 	}
 
 	for(int i = 0; i < 3; i++) {
-		setBlockID(X + 2 + i*2, Y + 3, iLevelType == 3 ? 155 : 43);
-		setBlockID(X + 2 + i*2, Y + 4, iLevelType == 3 ? 155 : 43);
+        setBlockID(X + 2 + i*2, Y + 3, iLevelType == 3 ? 155 : 43);
+        setBlockID(X + 2 + i*2, Y + 4, iLevelType == 3 ? 155 : 43);
 	}
 
 	for(int i = 0; i < 2; i++) {
-		setBlockID(X + 2, Y + 6 + i, iLevelType == 3 ? 155 : 43);
-		setBlockID(X + 3, Y + 6 + i, iLevelType == 3 ? 155 : 43);
-		setBlockID(X + 5, Y + 6 + i, iLevelType == 3 ? 155 : 43);
-		setBlockID(X + 6, Y + 6 + i, iLevelType == 3 ? 155 : 43);
+        setBlockID(X + 2, Y + 6 + i, iLevelType == 3 ? 155 : 43);
+        setBlockID(X + 3, Y + 6 + i, iLevelType == 3 ? 155 : 43);
+        setBlockID(X + 5, Y + 6 + i, iLevelType == 3 ? 155 : 43);
+        setBlockID(X + 6, Y + 6 + i, iLevelType == 3 ? 155 : 43);
 	}
 
-	setBlockID(X + 4, Y + 6, iLevelType == 3 ? 159 : 47);
-	setBlockID(X + 4, Y + 7, iLevelType == 3 ? 158 : 46);
+    setBlockID(X + 4, Y + 6, iLevelType == 3 ? 159 : 47);
+    setBlockID(X + 4, Y + 7, iLevelType == 3 ? 158 : 46);
 
 	for(int i = 0; i < 3; i++) {
-		setBlockID(X + 3 + i, Y + 8, iLevelType == 3 ? 156 : 44);
+        setBlockID(X + 3 + i, Y + 8, iLevelType == 3 ? 156 : 44);
 	}
 
-	setBlockID(X + 2, Y + 8, iLevelType == 3 ? 157 : 45);
-	setBlockID(X + 6, Y + 8, iLevelType == 3 ? 157 : 45);
+    setBlockID(X + 2, Y + 8, iLevelType == 3 ? 157 : 45);
+    setBlockID(X + 6, Y + 8, iLevelType == 3 ? 157 : 45);
 
-	setBlockID(X + 2, Y + 8, iLevelType == 3 ? 157 : 45);
+    setBlockID(X + 2, Y + 8, iLevelType == 3 ? 157 : 45);
 
-	setBlockID(X + 3, Y + 9, iLevelType == 3 ? 160 : 48);
-	setBlockID(X + 4, Y + 9, iLevelType == 3 ? 155 : 43);
-	setBlockID(X + 5, Y + 9, iLevelType == 3 ? 161 : 49);
+    setBlockID(X + 3, Y + 9, iLevelType == 3 ? 160 : 48);
+    setBlockID(X + 4, Y + 9, iLevelType == 3 ? 155 : 43);
+    setBlockID(X + 5, Y + 9, iLevelType == 3 ? 161 : 49);
 
 	for(int i = 0; i < 3; i++) {
-		setBlockID(X + 3 + i, Y + 10, iLevelType == 3 ? 157 : 45);
+        setBlockID(X + 3 + i, Y + 10, iLevelType == 3 ? 157 : 45);
 	}
 }
 
 void Map::structCastleWall(int X, int Y, int iWidth, int iHeight) {
 	for(int i = 0; i < iWidth; i++) {
 		for(int j = 0; j  < iHeight - 1; j++) {
-			lMap[X + i][Y + j]->setBlockID(iLevelType == 3 ? 155 : 43);
+            lMap[X + i][Y + j]->setBlockID(iLevelType == 3 ? 155 : 43);
 		}
 	}
 
 	for(int i = 0; i < iWidth; i++) {
-		lMap[X + i][Y + iHeight - 1]->setBlockID(iLevelType == 3 ? 157 : 45);
+        lMap[X + i][Y + iHeight - 1]->setBlockID(iLevelType == 3 ? 157 : 45);
 	}
 }
 
 void Map::structT(int X, int Y, int iWidth, int iHeight) {
 	for(int i = 0; i < iHeight - 1; i++) {
 		for(int j = 1; j < iWidth - 1; j++) {
-			lMap[X + j][Y + i]->setBlockID(iLevelType == 3 ? 154 : 70);
+            lMap[X + j][Y + i]->setBlockID(iLevelType == 3 ? 154 : 70);
 		}
 	}
 
 	for(int i = 1; i < iWidth - 1; i++) {
-		lMap[X + i][Y + iHeight - 1]->setBlockID(iLevelType == 3 ? 152 : 68);
+        lMap[X + i][Y + iHeight - 1]->setBlockID(iLevelType == 3 ? 152 : 68);
 	}
 
-	lMap[X][Y + iHeight - 1]->setBlockID(iLevelType == 3 ? 151 : 67);
-	lMap[X + iWidth - 1][Y + iHeight - 1]->setBlockID(iLevelType == 3 ? 153 : 69);
+    lMap[X][Y + iHeight - 1]->setBlockID(iLevelType == 3 ? 151 : 67);
+    lMap[X + iWidth - 1][Y + iHeight - 1]->setBlockID(iLevelType == 3 ? 153 : 69);
 }
 
 void Map::structTMush(int X, int Y, int iWidth, int iHeight) {
 	for(int i = 0; i < iHeight - 2; i++) {
-		lMap[X + iWidth/2][Y + i]->setBlockID(144);
+        lMap[X + iWidth/2][Y + i]->setBlockID(144);
 	}
 
-	lMap[X + iWidth/2][Y + iHeight - 2]->setBlockID(143);
+    lMap[X + iWidth/2][Y + iHeight - 2]->setBlockID(143);
 
 	for(int i = 1; i < iWidth - 1; i++) {
-		lMap[X + i][Y + iHeight - 1]->setBlockID(141);
+        lMap[X + i][Y + iHeight - 1]->setBlockID(141);
 	}
 
-	lMap[X][Y + iHeight - 1]->setBlockID(140);
-	lMap[X + iWidth - 1][Y + iHeight - 1]->setBlockID(142);
+    lMap[X][Y + iHeight - 1]->setBlockID(140);
+    lMap[X + iWidth - 1][Y + iHeight - 1]->setBlockID(142);
 }
 
 void Map::structWater(int X, int Y, int iWidth, int iHeight) {
 	for(int i = 0; i < iWidth; i++) {
 		for(int j = 0; j < iHeight - 1; j++) {
-			lMap[X + i][Y + j]->setBlockID(iLevelType == 2 ? 94 : 110);
+            lMap[X + i][Y + j]->setBlockID(iLevelType == 2 ? 94 : 110);
 		}
-		lMap[X + i][Y + iHeight - 1]->setBlockID(iLevelType == 2 ? 95 : 111);
+        lMap[X + i][Y + iHeight - 1]->setBlockID(iLevelType == 2 ? 95 : 111);
 	}
 }
 
 void Map::structLava(int X, int Y, int iWidth, int iHeight) {
 	for(int i = 0; i < iWidth; i++) {
 		for(int j = 0; j < iHeight - 1; j++) {
-			lMap[X + i][Y + j]->setBlockID(77);
+            lMap[X + i][Y + j]->setBlockID(77);
 		}
-		lMap[X + i][Y + iHeight - 1]->setBlockID(78);
+        lMap[X + i][Y + iHeight - 1]->setBlockID(78);
 	}
 }
 
 void Map::structBridge(int X, int Y, int iWidth) {
 	for(int i = 0; i < iWidth; i++) {
-		lMap[X + i][Y]->setBlockID(76);
+        lMap[X + i][Y]->setBlockID(76);
 	}
 
-	lMap[X + iWidth - 1][Y + 1]->setBlockID(79);
+    lMap[X + iWidth - 1][Y + 1]->setBlockID(79);
 
-	lMap[X + iWidth][6]->setBlockID(82);
-	lMap[X + iWidth + 1][6]->setBlockID(83);
-	lMap[X + iWidth + 1][7]->setBlockID(83);
-	lMap[X + iWidth + 1][8]->setBlockID(83);
+    lMap[X + iWidth][6]->setBlockID(82);
+    lMap[X + iWidth + 1][6]->setBlockID(83);
+    lMap[X + iWidth + 1][7]->setBlockID(83);
+    lMap[X + iWidth + 1][8]->setBlockID(83);
 }
 
 void Map::structBridge2(int X, int Y, int iWidth) {
 	for(int i = 0; i < iWidth; i++) {
-		lMap[X + i][Y]->setBlockID(107);
-		lMap[X + i][Y + 1]->setBlockID(iLevelType == 4 ? 122 : 108);
+        lMap[X + i][Y]->setBlockID(107);
+        lMap[X + i][Y + 1]->setBlockID(iLevelType == 4 ? 122 : 108);
 	}
 }
 
 void Map::structTree(int X, int Y, int iHeight, bool BIG) {
 	for(int i = 0; i < iHeight; i++) {
-		lMap[X][Y + i]->setBlockID(91);
+        lMap[X][Y + i]->setBlockID(91);
 	}
 
 	if(BIG) {
-		lMap[X][Y + iHeight]->setBlockID(iLevelType == 4 ? 88 : 85);
-		lMap[X][Y + iHeight + 1]->setBlockID(iLevelType == 4 ? 89 : 86);
+        lMap[X][Y + iHeight]->setBlockID(iLevelType == 4 ? 88 : 85);
+        lMap[X][Y + iHeight + 1]->setBlockID(iLevelType == 4 ? 89 : 86);
 	} else {
-		lMap[X][Y + iHeight]->setBlockID(iLevelType == 4 ? 87 : 84);
+        lMap[X][Y + iHeight]->setBlockID(iLevelType == 4 ? 87 : 84);
 	}
 }
 
 void Map::structFence(int X, int Y, int iWidth) {
 	for(int i = 0; i < iWidth; i++) {
-		lMap[X + i][Y]->setBlockID(90);
+        lMap[X + i][Y]->setBlockID(90);
 	}
 }
 
@@ -10219,22 +10265,22 @@ void Map::structPlatformLine(int X) {
 
 void Map::structSeeSaw(int X, int Y, int iWidth) {
 	lMap[X][Y]->setBlockID(iLevelType == 3 ? 162 : 132);
-	lMap[X + iWidth - 1][Y]->setBlockID(iLevelType == 3 ? 163 : 133);
+    lMap[X + iWidth - 1][Y]->setBlockID(iLevelType == 3 ? 163 : 133);
 
 	for(int i = 1; i < iWidth - 1; i++) {
-		lMap[X + i][Y]->setBlockID(iLevelType == 3 ? 164 : 134);
+        lMap[X + i][Y]->setBlockID(iLevelType == 3 ? 164 : 134);
 	}
 }
 
 void Map::structBulletBill(int X, int Y, int iHieght) {
-	lMap[X][Y + iHieght + 1]->setBlockID(145);
-	lMap[X][Y + iHieght]->setBlockID(146);
+    lMap[X][Y + iHieght + 1]->setBlockID(145);
+    lMap[X][Y + iHieght]->setBlockID(146);
 
 	for(int i = 0; i < iHieght; i++) {
-		lMap[X][Y + i]->setBlockID(147);
+        lMap[X][Y + i]->setBlockID(147);
 	}
 
-	addBulletBillSpawner(X, Y + iHieght + 1, 0);
+    addBulletBillSpawner(X, Y + iHieght + 1, 0);
 }
 
 /* ******************************************** */

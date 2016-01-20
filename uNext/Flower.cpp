@@ -11,7 +11,7 @@ Flower::Flower(int iXPos, int fYPos, int iX, int iY) {
 	this->moveSpeed = 2;
 	this->inSpawnState = true;
 	this->minionSpawned = true;
-	this->inSpawnY = 32;
+    this->inSpawnY = 32*CCFG::GAME_SIZE;
 	this->moveDirection = false;
 	this->collisionOnlyWithPlayer = true;
 

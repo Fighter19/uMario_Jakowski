@@ -14,8 +14,8 @@ HammerBro::HammerBro(int iXPos, int iYPos) {
 	this->moveSpeed = 1;
 	this->minionState = 0;
 
-	this->iHitBoxX = 32;
-	this->iHitBoxY = 48;
+    this->iHitBoxX = 32*CCFG::GAME_SIZE;
+    this->iHitBoxY = 48*CCFG::GAME_SIZE;
 
 	this->iBlockID = CCore::getMap()->getLevelType() == 0 || CCore::getMap()->getLevelType() == 4 ? 43 : 45;
 

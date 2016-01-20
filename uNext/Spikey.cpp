@@ -7,8 +7,8 @@ Spikey::Spikey(int iXPos, int iYPos) {
 	this->fXPos = (float)iXPos;
 	this->fYPos = (float)iYPos + 6;
 
-	this->iHitBoxX = 32;
-	this->iHitBoxY = 26;
+    this->iHitBoxX = 32*CCFG::GAME_SIZE;
+    this->iHitBoxY = 26*CCFG::GAME_SIZE;
 
 	this->iBlockID = 52;
 
