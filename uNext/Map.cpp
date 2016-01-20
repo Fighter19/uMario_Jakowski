@@ -558,7 +558,7 @@ int Map::checkCollisionWithPlatform(int nX, int nY, int iHitBoxX, int iHitBoxY) 
 }
 
 bool Map::checkCollision(Vector2* nV, bool checkVisible) {
-	bool output = vBlock[lMap[nV->getX()][nV->getY()]->getBlockID()]->getCollision() && (checkVisible ? vBlock[lMap[nV->getX()][nV->getY()]->getBlockID()]->getVisible() : true);
+    bool output = vBlock[lMap[nV->getX()][nV->getY()]->getBlockID()]->getCollision() && (checkVisible ? vBlock[lMap[nV->getX()][nV->getY()]->getBlockID()]->getVisible() : true);
 	delete nV;
 	return output;
 }
@@ -595,8 +595,6 @@ int Map::getListID(int nX) {
 }
 
 void Map::addPoints(int X, int Y, std::string sText, int iW, int iH) {
-    X = X*CCFG::GAME_SIZE;
-    Y = Y*CCFG::GAME_SIZE;
 	lPoints.push_back(new Points(X, Y, sText, iW, iH));
 }
 
@@ -651,8 +649,6 @@ void Map::addSquid(int X, int Y) {
 }
 
 void Map::addHammer(int X, int Y, bool moveDirection) {
-    X = X*CCFG::GAME_SIZE;
-    Y = Y*CCFG::GAME_SIZE;
 	lMinion[getListID(X)].push_back(new Hammer(X, Y, moveDirection));
 }
 
@@ -677,8 +673,6 @@ void Map::addSpikey(int X, int Y) {
 }
 
 void Map::addPlayerFireBall(int X, int Y, bool moveDirection) {
-    X = X*CCFG::GAME_SIZE;
-    Y = Y*CCFG::GAME_SIZE;
 	lMinion[getListID(X)].push_back(new PlayerFireBall(X, Y, moveDirection));
 }
 
@@ -8596,7 +8590,7 @@ bool Map::blockUse(int nX, int nY, int iBlockID, int POS) {
 			case 13: case 28: case 81: // ----- Brick
 				if(lMap[nX][nY]->getSpawnStar()) {
 					lMap[nX][nY]->setBlockID(iLevelType == 0 || iLevelType == 4 ? 9 : iLevelType == 1 ? 56 : 80);
-                    lMinion[getListID(32 * nX)].push_back(new Star(32 * nX, CCFG::GAME_HEIGHT - 16 - 32 * nY * CCFG::GAME_SIZE, nX, nY));
+                    lMinion[getListID(32 * nX)].push_back(new Star(32 * nX * CCFG::GAME_SIZE, CCFG::GAME_HEIGHT - 16 - 32 * nY * CCFG::GAME_SIZE, nX, nY));
 					lMap[nX][nY]->startBlockAnimation();
 					CCFG::getMusic()->PlayChunk(CCFG::getMusic()->cMUSHROOMAPPER);
 				} else if(lMap[nX][nY]->getSpawnMushroom()) {
@@ -9624,7 +9618,7 @@ void Map::playerDeath(bool animation, bool instantDeath) {
 			oEvent->vOLDLength.push_back(64);
 
 			oEvent->vOLDDir.push_back(oEvent->eDEATHBOT);
-			oEvent->vOLDLength.push_back(CCFG::GAME_HEIGHT - oPlayer->getYPos() + 128);
+            oEvent->vOLDLength.push_back(CCFG::GAME_HEIGHT - oPlayer->getYPos() + 128*CCFG::GAME_SIZE);
 		} else {
 			oEvent->iSpeed = 4;
 			oEvent->newLevelType = iLevelType;
@@ -9938,8 +9932,8 @@ void Map::structCloud(int X, int Y, int iSize) {
 }
 
 void Map::structGND(int X, int Y, int iWidth, int iHeight) {
-	for(int i = 0; i < iWidth; i++) {
-		for(int j = 0; j < iHeight; j++) {
+    for(int i = 0; i < iWidth; i++) {
+        for(int j = 0; j < iHeight; j++) {
             lMap[X + i][Y + j]->setBlockID(iLevelType == 0 || iLevelType == 4 ? 1 : iLevelType == 1 ? 26 : iLevelType == 2 ? 92 : iLevelType == 6 ? 166 : iLevelType == 7 ? 181 : 75);
 		}
 	}
@@ -10405,7 +10399,7 @@ Block* Map::getMinionBlock(int iID) {
 }
 
 MapLevel* Map::getMapBlock(int iX, int iY) {
-	return lMap[iX][iY];
+    return lMap[iX][iY];
 }
 
 Flag* Map::getFlag() {

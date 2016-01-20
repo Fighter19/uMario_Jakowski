@@ -873,7 +873,7 @@ void Player::updateYPos(int iN) {
 					} else {
 						Vector2* vLT = getBlockLT(fXPos - CCore::getMap()->getXPos(), fYPos + iN);
 
-						if (CCore::getMap()->getBlock(CCore::getMap()->getMapBlock(vLT->getX(), vLT->getY())->getBlockID())->getUse()) {
+                        if (CCore::getMap()->getBlock(CCore::getMap()->getMapBlock(vLT->getX(), vLT->getY())->getBlockID())->getUse()) {
 							if(CCore::getMap()->blockUse(vLT->getX(), vLT->getY(), CCore::getMap()->getMapBlock(vLT->getX(), vLT->getY())->getBlockID(), 0)) {
 								jumpState = 2;
 							}
@@ -896,7 +896,7 @@ void Player::updateYPos(int iN) {
 
 	if(!CCore::getMap()->getInEvent() && fYPos - getHitBoxY() > CCFG::GAME_HEIGHT) {
 		CCore::getMap()->playerDeath(false, true);
-		fYPos = -80;
+        fYPos = -80;
 	}
 }
 
@@ -905,16 +905,16 @@ void Player::updateYPos(int iN) {
 bool Player::checkCollisionBot(int nX, int nY) {
 	Vector2* vLT = getBlockLB(fXPos - CCore::getMap()->getXPos() + nX, fYPos + nY);
 
-	if (CCore::getMap()->getBlock(CCore::getMap()->getMapBlock(vLT->getX(), vLT->getY())->getBlockID())->getUse()) {
-		CCore::getMap()->blockUse(vLT->getX(), vLT->getY(), CCore::getMap()->getMapBlock(vLT->getX(), vLT->getY())->getBlockID(), 1);
+    if (CCore::getMap()->getBlock(CCore::getMap()->getMapBlock(vLT->getX(), vLT->getY())->getBlockID())->getUse()) {
+        CCore::getMap()->blockUse(vLT->getX()*CCFG::GAME_SIZE, vLT->getY()*CCFG::GAME_SIZE, CCore::getMap()->getMapBlock(vLT->getX(), vLT->getY())->getBlockID(), 1);
 	}
 
 	delete vLT;
 
 	vLT = getBlockRB(fXPos - CCore::getMap()->getXPos() + nX, fYPos + nY);
 
-	if (CCore::getMap()->getBlock(CCore::getMap()->getMapBlock(vLT->getX(), vLT->getY())->getBlockID())->getUse()) {
-		CCore::getMap()->blockUse(vLT->getX(), vLT->getY(), CCore::getMap()->getMapBlock(vLT->getX(), vLT->getY())->getBlockID(), 1);
+    if (CCore::getMap()->getBlock(CCore::getMap()->getMapBlock(vLT->getX(), vLT->getY())->getBlockID())->getUse()) {
+        CCore::getMap()->blockUse(vLT->getX()*CCFG::GAME_SIZE, vLT->getY()*CCFG::GAME_SIZE, CCore::getMap()->getMapBlock(vLT->getX(), vLT->getY())->getBlockID(), 1);
 	}
 
 	delete vLT;
@@ -926,7 +926,7 @@ bool Player::checkCollisionCenter(int nX, int nY) {
 		Vector2* vLT = getBlockLC(fXPos - CCore::getMap()->getXPos() + nX, fYPos + nY);
 
 		if (CCore::getMap()->getBlock(CCore::getMap()->getMapBlock(vLT->getX(), vLT->getY())->getBlockID())->getUse()) {
-			CCore::getMap()->blockUse(vLT->getX(), vLT->getY(), CCore::getMap()->getMapBlock(vLT->getX(), vLT->getY())->getBlockID(), 2);
+            CCore::getMap()->blockUse(vLT->getX()*CCFG::GAME_SIZE, vLT->getY()*CCFG::GAME_SIZE, CCore::getMap()->getMapBlock(vLT->getX(), vLT->getY())->getBlockID(), 2);
 		}
 
 		delete vLT;

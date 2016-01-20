@@ -19,7 +19,11 @@ public:
 	~CCFG(void);
 
     static int GAME_WIDTH, GAME_HEIGHT;
+#if defined (PSP) || defined (PSPPC)
     constexpr static float GAME_SIZE = 0.5f;
+#else
+    constexpr static float GAME_SIZE = 1.0f;
+#endif
 
 	static bool keySpace;
 

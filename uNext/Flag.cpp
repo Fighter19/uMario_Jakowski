@@ -40,7 +40,7 @@ void Flag::Draw(SDL_Renderer* rR, CIMG* iIMG) {
 }
 
 void Flag::DrawCastleFlag(SDL_Renderer* rR, CIMG* iIMG) {
-	iIMG->Draw(rR, (int)(iXPos + CCore::getMap()->getXPos() + castleFlagExtraXPos + 7*32 - 14), CCFG::GAME_HEIGHT + 14 - 6*32 - castleFlagY);
+    iIMG->Draw(rR, (int)(iXPos + CCore::getMap()->getXPos() + castleFlagExtraXPos + 7*32 - 14), CCFG::GAME_HEIGHT + 14 - 6*32 - castleFlagY);
 }
 
 /* ******************************************** */

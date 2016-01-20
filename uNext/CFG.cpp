@@ -12,7 +12,7 @@ CCFG::~CCFG(void) {
 
 /* ******************************************** */
 
-#ifndef PSP
+#if not defined (PSP) && not defined (PSPPC)
 int CCFG::GAME_WIDTH  = 800;
 int CCFG::GAME_HEIGHT = 448;
 #else

@@ -21,7 +21,7 @@ Event::~Event(void) {
 void Event::Draw(SDL_Renderer* rR) {
 	for(unsigned int i = 0; i < reDrawX.size(); i++) {
 		if(reDrawX[i] < CCore::getMap()->getMapWidth())
-			CCore::getMap()->getBlock(CCore::getMap()->getMapBlock(reDrawX[i], reDrawY[i])->getBlockID())->Draw(rR, 32 * reDrawX[i] + (int)CCore::getMap()->getXPos(), CCFG::GAME_HEIGHT - 32 * reDrawY[i] - 16);
+            CCore::getMap()->getBlock(CCore::getMap()->getMapBlock(reDrawX[i], reDrawY[i])->getBlockID())->Draw(rR, 32 * reDrawX[i] + (int)CCore::getMap()->getXPos(), CCFG::GAME_HEIGHT - 32 * reDrawY[i] - 16);
 	}
 }
 
